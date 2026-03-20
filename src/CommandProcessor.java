@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.prefs.Preferences;
 
 public class CommandProcessor {
 
@@ -42,6 +43,54 @@ public class CommandProcessor {
             case "list" -> {
                 handleList(parts);
             }
+            case "like" -> {
+                handlePreference(parts, true);
+            }
+            case "dislike" -> {
+                handlePreference(parts, false);
+            }
+            case "reset" -> {
+                handleReset(parts);
+            }
+        }
+    }
+
+    private void handleReset(String[] parts) {
+        if (parts.length == 2 && parts[1].equals("preferences")) {
+            skier.resetPreferences();
+        } else  {
+            System.err.println("ERROR: Invalid syntax. Use: reset preferences.");
+        }
+    }
+
+    private void handlePreference(String[] parts, boolean isLike) {
+        if (parts.length != 2) {
+            System.err.println("ERROR: Invalid syntax");
+            return;
+        }
+
+        String prefString = parts[1];
+
+        try {
+            Difficulty difficulty = Difficulty.valueOf(prefString);
+            if (isLike) {
+                skier.addLikedDifficulty(difficulty);
+            } else {
+                skier.addDislikedDifficulty(difficulty);
+            }
+            return;
+        } catch (IllegalArgumentException e) {}
+
+        try {
+            Surface surface = Surface.valueOf(prefString);
+            if (isLike) {
+                skier.addLikedSurface(surface);
+            } else {
+                skier.addDislikedSurface(surface);
+            }
+            return;
+        } catch (IllegalArgumentException e) {
+            System.err.println("ERROR: Invalid invalid preference. Must be a Difficulty or Surface.");
         }
     }
 
