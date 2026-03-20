@@ -16,7 +16,7 @@ public class Piste implements SkiNode {
 
     @Override
     public String getId() {
-        return "";
+        return this.id;
     }
 
     public Difficulty getDifficulty() {

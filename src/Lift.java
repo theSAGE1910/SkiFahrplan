@@ -22,7 +22,7 @@ public class Lift implements SkiNode {
 
     @Override
     public String getId() {
-        return "";
+        return this.id;
     }
 
     public LiftType getType() {

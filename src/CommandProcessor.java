@@ -39,6 +39,36 @@ public class CommandProcessor {
             case "load" -> {
                 handleLoad(parts);
             }
+            case "list" -> {
+                handleList(parts);
+            }
+        }
+    }
+
+    private void handleList(String[] parts) {
+        if (this.skiArea == null || this.skiArea.getLifts().isEmpty()) {
+            System.err.println("ERROR: No ski area loaded.");
+            return;
+        }
+
+        if (parts.length == 2 && parts[1].equals("lifts")) {
+            for (Lift lift : this.skiArea.getLifts()) {
+                System.out.println(lift.getId() + " " + lift.getType() + " " +
+                        lift.getStartTime() + " " + lift.getEndTime() + " " +
+                        lift.getRideDuration() + " " + lift.getWaitTime());
+
+                if (lift.isBaseStation()) {
+                    System.out.print("TRANSIT");
+                }
+                System.out.println();
+            }
+        } else if (parts.length == 2 && parts[1].equals("slopes")) {
+            for (Piste piste : this.skiArea.getPistes()) {
+                System.out.println(piste.getId() + " " + piste.getDifficulty() + " " +
+                        piste.getSurface() + " " + piste.getLength() + " " + piste.getAltitudeDifference());
+            }
+        } else {
+            System.err.println("ERROR: Invalid syntax.");
         }
     }
 
@@ -49,6 +79,8 @@ public class CommandProcessor {
                 this.skiArea = AreaParser.parse(filepath);
             } catch (IllegalArgumentException e) {
                 System.err.println("Error: Invalid ski area definition.");
+            } catch (IOException e) {
+                System.err.println("Error: File not found");
             }
         } else {
             System.err.println("Error: Invalid syntax.");
