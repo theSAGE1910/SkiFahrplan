@@ -33,6 +33,29 @@ public class Piste implements SkiNode {
     }
 
     public int calculateTravelTime(SkillLevel skill) {
-        return 0;
+
+        double mDifficulty = switch (this.difficulty) {
+            case BLUE -> 1.00;
+            case RED -> 1.15;
+            case BLACK -> 1.35;
+        };
+
+        double mSurface = switch (this.surface) {
+            case REGULAR -> 1.00;
+            case BUMPY -> 1.20;
+            case ICY -> 1.30;
+        };
+
+        double mSkill = switch (skill) {
+            case BEGINNER -> 1.35;
+            case INTERMEDIATE -> 1.10;
+            case EXPERT -> 0.90;
+        };
+
+        double gradient = (double) this.altitudeDifference / this.length;
+        double denominator = 8.0 * mDifficulty * mSurface * (1.0 + 2.0 * gradient) * mSkill;
+        double timeInSeconds = this.length / denominator;
+
+        return (int) Math.ceil(timeInSeconds);
     }
 }
