@@ -1,8 +1,13 @@
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SkiArea {
     Map<SkiNode, List<SkiNode>> connections;
+
+    public SkiArea() {
+        this.connections = new HashMap<>();
+    }
 
     public void addNode(SkiNode node) {}
 
