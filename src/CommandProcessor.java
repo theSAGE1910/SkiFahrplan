@@ -1,8 +1,9 @@
+import java.io.IOException;
 import java.util.Scanner;
 
 public class CommandProcessor {
 
-    private final SkiArea skiArea;
+    private SkiArea skiArea;
     private final Skier skier;
     private boolean isRunning;
 
@@ -33,24 +34,44 @@ public class CommandProcessor {
                 handleQuit(parts);
             }
             case "set" -> {
-                if (parts.length == 3 && parts[1].equals("skill")) {
-                    try {
-                        SkillLevel skill = SkillLevel.valueOf(parts[2]);
-                        skier.setSkillLevel(skill);
-                    } catch (IllegalArgumentException e) {
-                        System.err.println("Error: Invalid skill level");
-                    }
-                } else if (parts.length == 3 && parts[1].equals("goal")) {
-                    try {
-                        Goal goal = Goal.valueOf(parts[2]);
-                        skier.setGoal(goal);
-                    } catch (IllegalArgumentException e) {
-                        System.err.println("Error: Invalid goal name");
-                    }
-                } else {
-                    System.err.println("Error: Invalid command");
-                }
+                handleSet(parts);
             }
+            case "load" -> {
+                handleLoad(parts);
+            }
+        }
+    }
+
+    private void handleLoad(String[] parts) {
+        if (parts.length == 3 && parts[1].equals("area")) {
+            String filepath = parts[2];
+            try {
+                this.skiArea = AreaParser.parse(filepath);
+            } catch (IllegalArgumentException e) {
+                System.err.println("Error: Invalid ski area definition.");
+            }
+        } else {
+            System.err.println("Error: Invalid syntax.");
+        }
+    }
+
+    private void handleSet(String[] parts) {
+        if (parts.length == 3 && parts[1].equals("skill")) {
+            try {
+                SkillLevel skill = SkillLevel.valueOf(parts[2]);
+                skier.setSkillLevel(skill);
+            } catch (IllegalArgumentException e) {
+                System.err.println("Error: Invalid skill level");
+            }
+        } else if (parts.length == 3 && parts[1].equals("goal")) {
+            try {
+                Goal goal = Goal.valueOf(parts[2]);
+                skier.setGoal(goal);
+            } catch (IllegalArgumentException e) {
+                System.err.println("Error: Invalid goal name");
+            }
+        } else {
+            System.err.println("Error: Invalid command");
         }
     }
 
