@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AreaParser {
+public final class AreaParser {
 
     private static final Pattern TRANSIT_LIFT_PATTERN = Pattern.compile("^([a-zA-Z0-9_]+)\\[\\[\\1(GONDOLA|CHAIRLIFT);(\\d{2}:\\d{2});(\\d{2}:\\d{2});(\\d+);(\\d+)\\]\\]$");
     private static final Pattern REGULAR_LIFT_PATTERN = Pattern.compile("^([a-zA-Z0-9_]+)\\[\\1(GONDOLA|CHAIRLIFT);(\\d{2}:\\d{2});(\\d{2}:\\d{2});(\\d+);(\\d+)\\]$");
@@ -67,22 +67,22 @@ public class AreaParser {
         System.err.println("ERROR: Invalid line format");
     }
 
-    private static Lift createLift(Matcher m, boolean isTransit) {
-        String id = m.group(1);
-        LiftType type = LiftType.valueOf(m.group(2));
-        LocalTime startTime = LocalTime.parse(m.group(3));
-        LocalTime endTime = LocalTime.parse(m.group(4));
-        int rideDuration = Integer.parseInt(m.group(5));
-        int waitTime = Integer.parseInt(m.group(6));
+    private static Lift createLift(Matcher matcher, boolean isTransit) {
+        String id = matcher.group(1);
+        LiftType type = LiftType.valueOf(matcher.group(2));
+        LocalTime startTime = LocalTime.parse(matcher.group(3));
+        LocalTime endTime = LocalTime.parse(matcher.group(4));
+        int rideDuration = Integer.parseInt(matcher.group(5));
+        int waitTime = Integer.parseInt(matcher.group(6));
         return new Lift(id, type, startTime, endTime, rideDuration, waitTime,  isTransit);
     }
 
-    private static Piste createPiste(Matcher m) {
-        String id = m.group(1);
-        Difficulty diff = Difficulty.valueOf(m.group(2));
-        Surface surf = Surface.valueOf(m.group(3));
-        int length = Integer.parseInt(m.group(4));
-        int altitude = Integer.parseInt(m.group(5));
+    private static Piste createPiste(Matcher matcher) {
+        String id = matcher.group(1);
+        Difficulty diff = Difficulty.valueOf(matcher.group(2));
+        Surface surf = Surface.valueOf(matcher.group(3));
+        int length = Integer.parseInt(matcher.group(4));
+        int altitude = Integer.parseInt(matcher.group(5));
         return new Piste(id, diff, surf, length, altitude);
     }
 }

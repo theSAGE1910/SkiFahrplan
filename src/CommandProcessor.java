@@ -50,6 +50,7 @@ public class CommandProcessor {
             case "next" -> handleNext(parts);
             case "take" -> handleTake(parts);
             case "abort" -> handleAbort(parts);
+            default -> System.err.println("ERROR: Unknown command: " + command);
         }
     }
 

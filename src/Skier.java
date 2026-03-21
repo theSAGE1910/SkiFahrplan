@@ -39,12 +39,12 @@ public class Skier {
         dislikedDifficulties.add(difficulty);
     }
 
-    public boolean likesDifficulty(Difficulty d) {
-        return likedDifficulties.contains(d);
+    public boolean likesDifficulty(Difficulty difficulty) {
+        return likedDifficulties.contains(difficulty);
     }
 
-    public boolean dislikesDifficulty(Difficulty d) {
-        return dislikedDifficulties.contains(d);
+    public boolean dislikesDifficulty(Difficulty difficulty) {
+        return dislikedDifficulties.contains(difficulty);
     }
 
     public void addLikedSurface(Surface surface) {
@@ -55,12 +55,12 @@ public class Skier {
         dislikedSurfaces.add(surface);
     }
 
-    public boolean likesSurface(Surface d) {
-        return likedSurfaces.contains(d);
+    public boolean likesSurface(Surface surface) {
+        return likedSurfaces.contains(surface);
     }
 
-    public boolean dislikesSurface(Surface d) {
-        return dislikedSurfaces.contains(d);
+    public boolean dislikesSurface(Surface surface) {
+        return dislikedSurfaces.contains(surface);
     }
 
     public void resetPreferences() {
