@@ -76,6 +76,11 @@ public class SkiArea {
         return nodesById.get(id);
     }
 
+    public List<SkiNode> getConnections(SkiNode node) {
+        return connections.get(node);
+        //return connections.getOrDefault(node, new ArrayList<>());
+    }
+
     public boolean validateConnection(SkiNode node1, SkiNode node2) {
         return false;
     }
