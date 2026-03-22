@@ -74,16 +74,10 @@ public class RoutePlanner {
                 readyToBoard = lift.getStartTime();
             }
 
-            long secondsSinceStart = Duration.between(lift.getStartTime(), readyToBoard).getSeconds();
-            long rideDurationSeconds = lift.getRideDuration() * 60L;
-            long intervals = (long) Math.ceil((double) secondsSinceStart / rideDurationSeconds);
-
-            LocalTime actualBoardingTime = lift.getStartTime().plusSeconds(intervals * rideDurationSeconds);
-
-            if (actualBoardingTime.isAfter(lift.getEndTime())) {
+            if (!readyToBoard.isBefore(lift.getEndTime())) {
                 return null;
             }
-            return actualBoardingTime.plusMinutes(lift.getRideDuration());
+            return readyToBoard.plusMinutes(lift.getRideDuration());
         } else if (nextNode instanceof Piste) {
             Piste piste = (Piste) nextNode;
 

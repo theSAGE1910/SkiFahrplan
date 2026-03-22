@@ -56,14 +56,12 @@ public class Route {
                     score += piste.getAltitudeDifference();
                 } else if (goal == Goal.DISTANCE) {
                     score += piste.getLength();
+                } else if (goal == Goal.NUMBER) {
+                    score += 1;
                 } else if (goal == Goal.UNIQUE) {
                     if (uniquePistes.add(piste)) {
                         score += 1;
                     }
-                }
-
-                if (skier.dislikesSurface(piste.getSurface()) || skier.dislikesDifficulty(piste.getDifficulty())) {
-                    score -= 100000;
                 }
             }
         }

@@ -53,8 +53,8 @@ public class Piste implements SkiNode {
         };
 
         double gradient = (double) this.altitudeDifference / this.length;
-        double denominator = 8.0 * mDifficulty * mSurface * (1.0 + 2.0 * gradient) * mSkill;
-        double timeInSeconds = this.length / denominator;
+        double multipliers = mDifficulty * mSurface * (1.0 + 2.0 * gradient) * mSkill;
+        double timeInSeconds = (this.length / 8.0) * multipliers;
 
         return (int) Math.ceil(timeInSeconds);
     }
