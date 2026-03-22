@@ -43,7 +43,8 @@ public class Route {
         return truncated;
     }
 
-    public int calculateUtility(Goal goal) {
+    public int calculateUtility(Skier skier) {
+        Goal goal = skier.getGoal();
         int score = 0;
         Set<SkiNode> uniquePistes = new HashSet<>();
 
@@ -59,6 +60,10 @@ public class Route {
                     if (uniquePistes.add(piste)) {
                         score += 1;
                     }
+                }
+
+                if (skier.dislikesSurface(piste.getSurface()) || skier.dislikesDifficulty(piste.getDifficulty())) {
+                    score -= 100000;
                 }
             }
         }

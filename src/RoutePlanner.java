@@ -1,3 +1,4 @@
+import java.time.Duration;
 import java.time.LocalTime;
 
 public class RoutePlanner {
@@ -68,13 +69,20 @@ public class RoutePlanner {
             Lift lift = (Lift) nextNode;
 
             LocalTime readyToBoard = arrivalTime.plusMinutes(lift.getWaitTime());
-            LocalTime actualBoardingTime = readyToBoard.isBefore(lift.getStartTime())
-                    ? lift.getStartTime() : readyToBoard;
+
+            if (readyToBoard.isBefore(lift.getStartTime())) {
+                readyToBoard = lift.getStartTime();
+            }
+
+            long secondsSinceStart = Duration.between(lift.getStartTime(), readyToBoard).getSeconds();
+            long rideDurationSeconds = lift.getRideDuration() * 60L;
+            long intervals = (long) Math.ceil((double) secondsSinceStart / rideDurationSeconds);
+
+            LocalTime actualBoardingTime = lift.getStartTime().plusSeconds(intervals * rideDurationSeconds);
 
             if (actualBoardingTime.isAfter(lift.getEndTime())) {
                 return null;
             }
-
             return actualBoardingTime.plusMinutes(lift.getRideDuration());
         } else if (nextNode instanceof Piste) {
             Piste piste = (Piste) nextNode;
@@ -89,10 +97,11 @@ public class RoutePlanner {
     private void evaluateAndSaveIfBest(Route newRoute) {
         if (bestRoute == null) {
             bestRoute = newRoute;
+            return;
         }
 
-        int newUtility = newRoute.calculateUtility(skier.getGoal());
-        int bestUtility = bestRoute.calculateUtility(skier.getGoal());
+        int newUtility = newRoute.calculateUtility(skier);
+        int bestUtility = bestRoute.calculateUtility(skier);
 
         if (newUtility > bestUtility) {
             bestRoute = newRoute;

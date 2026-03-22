@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
-import java.util.Random;
 import java.util.Scanner;
 
 public class CommandProcessor {
@@ -106,7 +105,7 @@ public class CommandProcessor {
             System.err.println("ERROR: take takes no arguments.");
             return;
         }
-        if (plannedRoute == null || currentRouteIndex >= plannedRoute.getPath().size()) {
+        if (plannedRoute == null || currentRouteIndex >= getRouteEndIndex()) {
             System.err.println("ERROR: No route planned or route already finished.");
             return;
         }
@@ -128,7 +127,7 @@ public class CommandProcessor {
             return;
         }
 
-        if (currentRouteIndex >= plannedRoute.getPath().size()) {
+        if (currentRouteIndex >= getRouteEndIndex()) {
             System.out.println("route finished!");
         } else {
             System.out.println(plannedRoute.getPath().get(currentRouteIndex).getId());
@@ -144,7 +143,7 @@ public class CommandProcessor {
             }
 
             StringBuilder sb = new StringBuilder();
-            for (int i = currentRouteIndex; i < plannedRoute.getPath().size(); i++) {
+            for (int i = currentRouteIndex; i < getRouteEndIndex(); i++) {
                 sb.append(plannedRoute.getPath().get(i).getId()).append(" ");
             }
             System.out.println(sb.toString().trim());
@@ -301,5 +300,16 @@ public class CommandProcessor {
         } else  {
             isRunning = false;
         }
+    }
+
+    private int getRouteEndIndex() {
+        int endIndex = plannedRoute.getPath().size();
+        SkiNode lastNode = plannedRoute.getCurrentNode();
+
+        if (lastNode instanceof Lift && ((Lift) lastNode).isBaseStation()) {
+            endIndex--;
+        }
+
+        return endIndex;
     }
 }
