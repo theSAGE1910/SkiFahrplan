@@ -165,8 +165,8 @@ public class CommandProcessor {
 
     private void handleShow(String[] parts) {
         if (parts.length == 2 && parts[1].equals("route")) {
-            if (plannedRoute == null) {
-                System.err.println("Error, No route planned.");
+            if (plannedRoute == null || currentRouteIndex >= getRouteEndIndex()) {
+                System.err.println("Error, No route planned or route already finished.");
                 return;
             }
 

@@ -14,7 +14,7 @@ public class RoutePlanner {
     private final SkiArea area;
     private final Skier skier;
     private Route bestRoute = null;
-    private int bestScore = -1;
+//    private int bestScore = -1;
 
     /**
      * Constructs a new {@code RoutePlanner} for the specified area and skier.
@@ -38,6 +38,12 @@ public class RoutePlanner {
      */
     public Route plan(String startLiftId, LocalTime startTime, LocalTime endTime) {
         SkiNode startNode = area.getNode(startLiftId);
+
+        LocalTime timeAfterFirstLift = calculateNextTime(startTime, startNode);
+
+        if (timeAfterFirstLift == null || timeAfterFirstLift.isAfter(endTime)) {
+            return null;
+        }
 
         Route initialRoute = new Route(startNode, startTime);
         this.bestRoute = null;
@@ -76,12 +82,21 @@ public class RoutePlanner {
     private void findBestRoute(Route currentRoute, LocalTime endTime, SkiNode forbiddenNode, int avoidDepth) {
         SkiNode currentNode = currentRoute.getCurrentNode();
 
-        if (currentNode instanceof Lift && ((Lift) currentNode).isBaseStation() && currentRoute.getPath().size() > 1) {
+        boolean reachesBaseStation = false;
+
+        for (SkiNode nextNode : area.getConnections(currentNode)) {
+            if (nextNode instanceof Lift && ((Lift) nextNode).isBaseStation()) {
+                reachesBaseStation = true;
+                break;
+            }
+        }
+
+        if (reachesBaseStation && currentRoute.getPath().size() > 1) {
             evaluateAndSaveIfBest(currentRoute);
         }
 
         for (SkiNode nextNode : area.getConnections(currentNode)) {
-            if (currentRoute.getPath().size() == avoidDepth && forbiddenNode != null && nextNode.equals(forbiddenNode)) {
+            if (currentRoute.getPath().size() == avoidDepth && nextNode.equals(forbiddenNode)) {
                 continue;
             }
 
