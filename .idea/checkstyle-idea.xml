@@ -5,11 +5,14 @@
     <scanScope>JavaOnly</scanScope>
     <copyLibs>true</copyLibs>
     <option name="thirdPartyClasspath" />
-    <option name="activeLocationIds" />
+    <option name="activeLocationIds">
+      <option value="4c2037aa-6898-4fdb-8424-3ff407016d74" />
+    </option>
     <option name="locations">
       <list>
         <ConfigurationLocation id="bundled-sun-checks" type="BUNDLED" scope="All" description="Sun Checks">(bundled)</ConfigurationLocation>
         <ConfigurationLocation id="bundled-google-checks" type="BUNDLED" scope="All" description="Google Checks">(bundled)</ConfigurationLocation>
+        <ConfigurationLocation id="4c2037aa-6898-4fdb-8424-3ff407016d74" type="LOCAL_FILE" scope="All" description="KIT - Final">C:\Users\astle\Downloads\checkstyle-sheet4-5 (1).xml</ConfigurationLocation>
       </list>
     </option>
   </component>
