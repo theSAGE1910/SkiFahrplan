@@ -146,6 +146,10 @@ public class RoutePlanner {
      * @param newRoute the newly completed valid route to evaluate
      */
     private void evaluateAndSaveIfBest(Route newRoute) {
+        if (newRoute.calculatePreferenceScore(skier) < 0) {
+            return;
+        }
+
         if (bestRoute == null) {
             bestRoute = newRoute;
             return;

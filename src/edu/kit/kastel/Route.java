@@ -134,14 +134,15 @@ public class Route {
         int score = 0;
 
         for (SkiNode node : path) {
-            if (node instanceof Piste) {
-                Piste piste = (Piste) node;
+            if (node instanceof Piste piste) {
 
                 if (skier.likesDifficulty(piste.getDifficulty())) {
                     score++;
                 } else if (skier.dislikesDifficulty(piste.getDifficulty())) {
                     score--;
-                } else if (skier.likesSurface(piste.getSurface())) {
+                }
+
+                if (skier.likesSurface(piste.getSurface())) {
                     score++;
                 } else if (skier.dislikesSurface(piste.getSurface())) {
                     score--;
