@@ -24,36 +24,40 @@ public class RoutePlanner {
             throw new IllegalArgumentException("ERROR: Start time must be after end time.");
         }
 
-        Route initialRoute = new Route((Lift) startNode, startTime);
+        Route initialRoute = new Route(startNode, startTime);
         this.bestRoute = null;
 
-        findBestRoute(initialRoute, endTime);
+        findBestRoute(initialRoute, endTime, null, initialRoute.getPath().size());
 
         return bestRoute;
     }
 
-    private void findBestRoute(Route currentRoute, LocalTime endTime) {
+    public Route findAlternativeRoute(Route currentRouteSoFar, LocalTime endTime, SkiNode forbiddenNextNode) {
+        this.bestRoute = null;
+        int currentDepth = currentRouteSoFar.getPath().size();
+
+        findBestRoute(currentRouteSoFar, endTime, forbiddenNextNode, currentDepth);
+
+        return this.bestRoute;
+    }
+
+    private void findBestRoute(Route currentRoute, LocalTime endTime, SkiNode forbiddenNode, int avoidDepth) {
         SkiNode currentNode = currentRoute.getCurrentNode();
 
-        if (currentNode instanceof Lift &&
-                ((Lift) currentNode).isBaseStation() &&
-                currentRoute.getPath().size() > 1) {
-
+        if (currentNode instanceof Lift && ((Lift) currentNode).isBaseStation() && currentRoute.getPath().size() > 1) {
             evaluateAndSaveIfBest(currentRoute);
-
-            int score = currentRoute.getPath().size();
-            if (score > bestScore) {
-                bestScore = score;
-                bestRoute = currentRoute;
-            }
         }
 
         for (SkiNode nextNode : area.getConnections(currentNode)) {
+            if (currentRoute.getPath().size() == avoidDepth && forbiddenNode != null && nextNode.equals(forbiddenNode)) {
+                continue;
+            }
+
             LocalTime nextTime = calculateNextTime(currentRoute.getCurrentTime(), nextNode);
 
             if (nextTime != null && !nextTime.isAfter(endTime)) {
                 Route nextRoute = new Route(currentRoute, nextNode, nextTime);
-                findBestRoute(nextRoute, endTime);
+                findBestRoute(nextRoute, endTime, forbiddenNode, avoidDepth);
             }
         }
 

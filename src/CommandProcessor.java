@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.Random;
 import java.util.Scanner;
 
 public class CommandProcessor {
@@ -11,6 +12,7 @@ public class CommandProcessor {
     private Route plannedRoute;
     private int currentRouteIndex;
     private boolean nextWasCalled;
+    private LocalTime activeEndTime;
 
     public CommandProcessor(SkiArea skiArea, Skier skier) {
         this.skiArea = skiArea;
@@ -49,6 +51,7 @@ public class CommandProcessor {
             case "show" -> handleShow(parts);
             case "next" -> handleNext(parts);
             case "take" -> handleTake(parts);
+            case "alternative" -> handleAlternative(parts);
             case "abort" -> handleAbort(parts);
             default -> System.err.println("ERROR: Unknown command: " + command);
         }
@@ -68,6 +71,34 @@ public class CommandProcessor {
         this.currentRouteIndex = 0;
         this.nextWasCalled = false;
         System.out.println("route aborted");
+    }
+
+    private void handleAlternative(String[] parts) {
+        if (parts.length != 1) {
+            System.err.println("ERROR: alternative takes no arguments.");
+            return;
+        }
+        if (plannedRoute == null || !nextWasCalled) {
+            System.err.println("ERROR: alternative must be called immediately after next");
+            return;
+        }
+        if (currentRouteIndex == 0) {
+            System.err.println("ERROR: Cannot calculate alternative for the starting base station");
+        }
+
+        SkiNode nodeToAvoid = plannedRoute.getPath().get(currentRouteIndex);
+        Route truncatedRoute = plannedRoute.getTruncatedRoute(currentRouteIndex - 1);
+
+        RoutePlanner planner = new RoutePlanner(this.skiArea, this.skier);
+        Route alternativeRoute = planner.findAlternativeRoute(truncatedRoute, activeEndTime, nodeToAvoid);
+
+        if (alternativeRoute == null) {
+            System.err.println("ERROR: No alternative found.");
+        } else {
+            System.out.println("avoided " +  nodeToAvoid.getId());
+            this.plannedRoute = alternativeRoute;
+            this.nextWasCalled  = false;
+        }
     }
 
     private void handleTake(String[] parts) {
@@ -153,6 +184,7 @@ public class CommandProcessor {
             } else {
                 System.out.println("route planned");
                 this.plannedRoute = bestRoute;
+                this.activeEndTime = endTime;
                 this.currentRouteIndex = 0;
                 this.nextWasCalled = false;
             }

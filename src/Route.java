@@ -6,18 +6,18 @@ import java.util.Set;
 
 public class Route {
     private final List<SkiNode> path;
-    private final LocalTime currentTime;
+    private final List<LocalTime> times = new ArrayList<>();
 
-    public Route(Lift startLift, LocalTime startTime) {
+    public Route(SkiNode startNode, LocalTime startTime) {
         this.path = new ArrayList<>();
-        this.path.add(startLift);
-        this.currentTime = startTime;
+        this.path.add(startNode);
+        this.times.add(startTime);
     }
 
     public Route(Route previousRoute, SkiNode nextNode, LocalTime newTime) {
         this.path = new ArrayList<>(previousRoute.path);
         this.path.add(nextNode);
-        this.currentTime = newTime;
+        this.times.add(newTime);
     }
 
     public List<SkiNode> getPath() {
@@ -25,11 +25,22 @@ public class Route {
     }
 
     public LocalTime getCurrentTime() {
-        return currentTime;
+        return this.times.get(this.times.size() - 1);
     }
 
     public SkiNode getCurrentNode() {
         return path.get(path.size() - 1);
+    }
+
+    public Route getTruncatedRoute(int upToIndex) {
+        Route truncated = new Route(this.path.get(0), this.times.get(0));
+
+        for (int i = 0; i <= upToIndex; i++) {
+            truncated.path.add(this.path.get(i));
+            truncated.times.add(this.times.get(i));
+        }
+
+        return truncated;
     }
 
     public int calculateUtility(Goal goal) {

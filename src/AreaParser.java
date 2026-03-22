@@ -9,9 +9,9 @@ import java.util.regex.Pattern;
 
 public final class AreaParser {
 
-    private static final Pattern TRANSIT_LIFT_PATTERN = Pattern.compile("^([a-zA-Z0-9_]+)\\[\\[\\1(GONDOLA|CHAIRLIFT);(\\d{2}:\\d{2});(\\d{2}:\\d{2});(\\d+);(\\d+)\\]\\]$");
-    private static final Pattern REGULAR_LIFT_PATTERN = Pattern.compile("^([a-zA-Z0-9_]+)\\[\\1(GONDOLA|CHAIRLIFT);(\\d{2}:\\d{2});(\\d{2}:\\d{2});(\\d+);(\\d+)\\]$");
-    private static final Pattern PISTE_PATTERN = Pattern.compile("^([a-zA-Z0-9_]+)\\(\\[\\1(BLUE|RED|BLACK);(REGULAR|ICY|BUMPY);(\\d+);(\\d+)\\]\\)$");
+    private static final Pattern TRANSIT_LIFT_PATTERN = Pattern.compile("^([a-zA-Z0-9_]+)\\[\\[\\1<br/>(GONDOLA|CHAIRLIFT);(\\d{2}:\\d{2});(\\d{2}:\\d{2});(\\d+);(\\d+)]]$");
+    private static final Pattern REGULAR_LIFT_PATTERN = Pattern.compile("^([a-zA-Z0-9_]+)\\[\\1<br/>(GONDOLA|CHAIRLIFT);(\\d{2}:\\d{2});(\\d{2}:\\d{2});(\\d+);(\\d+)]$");
+    private static final Pattern PISTE_PATTERN = Pattern.compile("^([a-zA-Z0-9_]+)\\(\\[\\1<br/>(BLUE|RED|BLACK);(REGULAR|ICY|BUMPY);(\\d+);(\\d+)]\\)$");
     private static final Pattern EDGE_PATTERN = Pattern.compile("^([a-zA-Z0-9_]+)\\s*-->\\s*([a-zA-Z0-9_]+)$");
 
     public static SkiArea parse(String filepath) throws IOException {
@@ -28,12 +28,9 @@ public final class AreaParser {
         for (String line : lines) {
             System.out.println(line);
 
-            if (line.equals("graph")) {
-                continue;
+            if (!line.strip().equals("graph")) {
+                parseLine(line.strip(), newArea);
             }
-
-            parseLine(line, newArea);
-
         }
 
         return newArea;
