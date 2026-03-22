@@ -16,6 +16,7 @@ public class Route {
 
     public Route(Route previousRoute, SkiNode nextNode, LocalTime newTime) {
         this.path = new ArrayList<>(previousRoute.path);
+        this.times.addAll(previousRoute.times);
         this.path.add(nextNode);
         this.times.add(newTime);
     }
@@ -35,7 +36,7 @@ public class Route {
     public Route getTruncatedRoute(int upToIndex) {
         Route truncated = new Route(this.path.get(0), this.times.get(0));
 
-        for (int i = 0; i <= upToIndex; i++) {
+        for (int i = 1; i <= upToIndex; i++) {
             truncated.path.add(this.path.get(i));
             truncated.times.add(this.times.get(i));
         }

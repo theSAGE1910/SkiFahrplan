@@ -65,6 +65,8 @@ public class Skier {
 
     public void resetPreferences() {
         likedDifficulties.clear();
+        dislikedDifficulties.clear();
+        likedSurfaces.clear();
         dislikedSurfaces.clear();
     }
 }
