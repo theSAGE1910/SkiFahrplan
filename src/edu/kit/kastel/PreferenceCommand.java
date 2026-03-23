@@ -10,6 +10,12 @@ package edu.kit.kastel;
  */
 public class PreferenceCommand implements Command {
 
+    private static final int EXPECTED_ARGS_LENGTH = 2;
+    private static final int ARG_PREF_INDEX = 1;
+
+    private static final String ERROR_INVALID_SYNTAX = "Error, Invalid syntax";
+    private static final String ERROR_INVALID_PREF = "Error, Invalid preference. Must be a Difficulty or Surface.";
+
     private final boolean isLike;
 
     /**
@@ -23,12 +29,12 @@ public class PreferenceCommand implements Command {
 
     @Override
     public void execute(String[] parts, SkiSession session) {
-        if (parts.length != 2) {
-            System.err.println("Error, Invalid syntax");
+        if (parts.length != EXPECTED_ARGS_LENGTH) {
+            System.err.println(ERROR_INVALID_SYNTAX);
             return;
         }
 
-        String prefString = parts[1];
+        String prefString = parts[ARG_PREF_INDEX];
 
         for (Difficulty difficulty : Difficulty.values()) {
             if (difficulty.name().equals(prefString)) {
@@ -54,6 +60,6 @@ public class PreferenceCommand implements Command {
             }
         }
 
-        System.err.println("Error, Invalid preference. Must be a Difficulty or Surface.");
+        System.err.println(ERROR_INVALID_PREF);
     }
 }

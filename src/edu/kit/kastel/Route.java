@@ -16,6 +16,16 @@ import java.util.Set;
  * @version 0.1
  */
 public class Route {
+
+    private static final int INDEX_OFFSET_LAST = 1;
+    private static final int INDEX_FIRST = 0;
+    private static final int INDEX_SECOND = 1;
+    private static final int INITIAL_SCORE = 0;
+    private static final int SCORE_INCREMENT = 1;
+
+    private static final String ERROR_UNEXPECTED_GOAL = "Unexpected value: ";
+    private static final String SEPARATOR_SPACE = " ";
+
     private final List<SkiNode> path;
     private final List<LocalTime> times;
 
@@ -61,7 +71,7 @@ public class Route {
      * @return the accumulated time at the end of the route
      */
     public LocalTime getCurrentTime() {
-        return this.times.get(this.times.size() - 1);
+        return this.times.get(this.times.size() - INDEX_OFFSET_LAST);
     }
 
     /**
@@ -70,7 +80,7 @@ public class Route {
      * @return the current node the skier is located at
      */
     public SkiNode getCurrentNode() {
-        return path.get(path.size() - 1);
+        return path.get(path.size() - INDEX_OFFSET_LAST);
     }
 
     /**
@@ -81,9 +91,9 @@ public class Route {
      * @return a new {@code Route} containing the path and times up to the specified index
      */
     public Route getTruncatedRoute(int upToIndex) {
-        Route truncated = new Route(this.path.get(0), this.times.get(0));
+        Route truncated = new Route(this.path.get(INDEX_FIRST), this.times.get(INDEX_FIRST));
 
-        for (int i = 1; i <= upToIndex; i++) {
+        for (int i = INDEX_SECOND; i <= upToIndex; i++) {
             truncated.path.add(this.path.get(i));
             truncated.times.add(this.times.get(i));
         }
@@ -100,7 +110,7 @@ public class Route {
      */
     public int calculateUtility(Skier skier) {
         Goal goal = skier.getGoal();
-        int score = 0;
+        int score = INITIAL_SCORE;
         Set<SkiNode> uniquePistes = new HashSet<>();
 
         for (SkiNode node : path) {
@@ -108,13 +118,13 @@ public class Route {
                 switch (goal) {
                     case ALTITUDE -> score += piste.getAltitudeDifference();
                     case DISTANCE -> score += piste.getLength();
-                    case NUMBER -> score += 1;
+                    case NUMBER -> score += SCORE_INCREMENT;
                     case UNIQUE -> {
                         if (uniquePistes.add(piste)) {
-                            score += 1;
+                            score += SCORE_INCREMENT;
                         }
                     }
-                    default -> System.err.println("Unexpected value: " + goal);
+                    default -> System.err.println(ERROR_UNEXPECTED_GOAL + goal);
                 }
             }
         }
@@ -130,7 +140,7 @@ public class Route {
      * @return the calculated preference score as an integer
      */
     public int calculatePreferenceScore(Skier skier) {
-        int score = 0;
+        int score = INITIAL_SCORE;
 
         for (SkiNode node : path) {
             if (node instanceof Piste piste) {
@@ -162,7 +172,7 @@ public class Route {
         StringBuilder sb = new StringBuilder();
 
         for (SkiNode node : path) {
-            sb.append(node.getId()).append(" ");
+            sb.append(node.getId()).append(SEPARATOR_SPACE);
         }
 
         return sb.toString().trim();

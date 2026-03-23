@@ -12,6 +12,19 @@ public class Piste implements SkiNode {
 
     private static final double BASE_SPEED_DIVISOR = 8.0;
     private static final double GRADIENT_MULTIPLIER = 2.0;
+    private static final double GRADIENT_BASE = 1.0;
+
+    private static final double DIFF_BLUE = 1.00;
+    private static final double DIFF_RED = 1.15;
+    private static final double DIFF_BLACK = 1.35;
+
+    private static final double SURF_REGULAR = 1.00;
+    private static final double SURF_BUMPY = 1.20;
+    private static final double SURF_ICY = 1.30;
+
+    private static final double SKILL_BEGINNER = 1.35;
+    private static final double SKILL_INTERMEDIATE = 1.10;
+    private static final double SKILL_EXPERT = 0.90;
 
     private final String id;
     private final Difficulty difficulty;
@@ -87,25 +100,25 @@ public class Piste implements SkiNode {
      */
     public int calculateTravelTime(SkillLevel skill) {
         double mDifficulty = switch (this.difficulty) {
-            case BLUE -> 1.00;
-            case RED -> 1.15;
-            case BLACK -> 1.35;
+            case BLUE -> DIFF_BLUE;
+            case RED -> DIFF_RED;
+            case BLACK -> DIFF_BLACK;
         };
 
         double mSurface = switch (this.surface) {
-            case REGULAR -> 1.00;
-            case BUMPY -> 1.20;
-            case ICY -> 1.30;
+            case REGULAR -> SURF_REGULAR;
+            case BUMPY -> SURF_BUMPY;
+            case ICY -> SURF_ICY;
         };
 
         double mSkill = switch (skill) {
-            case BEGINNER -> 1.35;
-            case INTERMEDIATE -> 1.10;
-            case EXPERT -> 0.90;
+            case BEGINNER -> SKILL_BEGINNER;
+            case INTERMEDIATE -> SKILL_INTERMEDIATE;
+            case EXPERT -> SKILL_EXPERT;
         };
 
         double gradient = (double) this.altitudeDifference / this.length;
-        double multipliers = mDifficulty * mSurface * (1.0 + GRADIENT_MULTIPLIER * gradient) * mSkill;
+        double multipliers = mDifficulty * mSurface * (GRADIENT_BASE + GRADIENT_MULTIPLIER * gradient) * mSkill;
         double timeInSeconds = (this.length / BASE_SPEED_DIVISOR) * multipliers;
 
         return (int) Math.round(timeInSeconds);

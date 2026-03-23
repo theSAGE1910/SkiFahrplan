@@ -10,6 +10,12 @@ package edu.kit.kastel;
  */
 public class AbortCommand implements Command {
 
+    private static final int EXPECTED_ARGS_LENGTH = 1;
+    private static final int DEFAULT_ROUTE_INDEX = 0;
+    private static final String ERROR_INVALID_ARGS = "Error, abort takes no arguments.";
+    private static final String ERROR_NO_ROUTE = "Error, No route to abort.";
+    private static final String SUCCESS_MESSAGE = "route aborted";
+
     /**
      * Terminates the active route and completely resets the skier's progress state.
      * Validates that a route is actually running before attempting to clear it.
@@ -19,18 +25,18 @@ public class AbortCommand implements Command {
      */
     @Override
     public void execute(String[] parts, SkiSession session) {
-        if (parts.length != 1) {
-            System.err.println("Error, abort takes no arguments.");
+        if (parts.length != EXPECTED_ARGS_LENGTH) {
+            System.err.println(ERROR_INVALID_ARGS);
             return;
         }
         if (session.getPlannedRoute() == null) {
-            System.err.println("Error, No route to abort.");
+            System.err.println(ERROR_NO_ROUTE);
             return;
         }
 
         session.setPlannedRoute(null);
-        session.setCurrentRouteIndex(0);
+        session.setCurrentRouteIndex(DEFAULT_ROUTE_INDEX);
         session.setNextWasCalled(false);
-        System.out.println("route aborted");
+        System.out.println(SUCCESS_MESSAGE);
     }
 }

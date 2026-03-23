@@ -31,14 +31,16 @@ public class SkiArea {
      * If a node with the same identifier already exists, an error is printed.
      *
      * @param node the {@link SkiNode} to be added to the graph
+     * @return {@code true} if the node was successfully added, or {@code false} if a node with the same ID already exists
      */
-    public void addNode(SkiNode node) {
+    public boolean addNode(SkiNode node) {
         if (this.nodesById.containsKey(node.getId())) {
             System.err.println("Error, Node with id " + node.getId() + " already exists");
-            return;
+            return false;
         }
         this.nodesById.put(node.getId(), node);
         connections.put(node, new ArrayList<>());
+        return true;
     }
 
     /**
@@ -47,16 +49,18 @@ public class SkiArea {
      *
      * @param fromId the unique identifier of the starting node
      * @param toId the unique identifier of the destination node
+     * @return {@code true} if the edge was successfully added, or {@code false} if either node does not exist
      */
-    public void addEdges(String fromId, String toId) {
+    public boolean addEdges(String fromId, String toId) {
         SkiNode fromNode = this.nodesById.get(fromId);
         SkiNode toNode = this.nodesById.get(toId);
 
         if (fromNode == null || toNode == null) {
             System.err.println("Error, Node does not exist");
-            return;
+            return false;
         }
         connections.get(fromNode).add(toNode);
+        return true;
     }
 
     /**

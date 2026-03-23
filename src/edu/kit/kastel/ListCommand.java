@@ -10,34 +10,39 @@ package edu.kit.kastel;
  */
 public class ListCommand implements Command {
 
-    /**
-     * Outputs a formatted list of either all lifts or all pistes contained in the
-     * current ski area, detailing their physical properties and operational parameters.
-     *
-     * @param parts the raw user input split by spaces
-     * @param session the current state context of the application
-     */
+    private static final int EXPECTED_ARGS_LENGTH = 2;
+    private static final int ARG_TYPE_INDEX = 1;
+    private static final String TYPE_LIFTS = "lifts";
+    private static final String TYPE_SLOPES = "slopes";
+
+    private static final String SEPARATOR = " ";
+    private static final String TRANSIT_SUFFIX = " TRANSIT";
+
+    private static final String ERROR_NO_AREA = "Error, No ski area loaded.";
+    private static final String ERROR_INVALID_SYNTAX = "Error, Invalid syntax.";
+
     @Override
     public void execute(String[] parts, SkiSession session) {
         if (session.getSkiArea() == null || session.getSkiArea().getLifts().isEmpty()) {
-            System.err.println("Error, No ski area loaded.");
+            System.err.println(ERROR_NO_AREA);
             return;
         }
 
-        if (parts.length == 2 && parts[1].equals("lifts")) {
+        if (parts.length == EXPECTED_ARGS_LENGTH && parts[ARG_TYPE_INDEX].equals(TYPE_LIFTS)) {
             for (Lift lift : session.getSkiArea().getLifts()) {
-                System.out.println(lift.getId() + " " + lift.getType() + " "
-                    + lift.getStartTime() + " " + lift.getEndTime() + " "
-                    + lift.getRideDuration() + " " + lift.getWaitTime()
-                    + (lift.isBaseStation() ? " TRANSIT" : ""));
+                System.out.println(lift.getId() + SEPARATOR + lift.getType() + SEPARATOR
+                    + lift.getStartTime() + SEPARATOR + lift.getEndTime() + SEPARATOR
+                    + lift.getRideDuration() + SEPARATOR + lift.getWaitTime()
+                    + (lift.isBaseStation() ? TRANSIT_SUFFIX : ""));
             }
-        } else if (parts.length == 2 && parts[1].equals("slopes")) {
+        } else if (parts.length == EXPECTED_ARGS_LENGTH && parts[ARG_TYPE_INDEX].equals(TYPE_SLOPES)) {
             for (Piste piste : session.getSkiArea().getPistes()) {
-                System.out.println(piste.getId() + " " + piste.getDifficulty() + " "
-                    + piste.getSurface() + " " + piste.getLength() + " " + piste.getAltitudeDifference());
+                System.out.println(piste.getId() + SEPARATOR + piste.getDifficulty() + SEPARATOR
+                    + piste.getSurface() + SEPARATOR + piste.getLength() + SEPARATOR
+                    + piste.getAltitudeDifference());
             }
         } else {
-            System.err.println("Error, Invalid syntax.");
+            System.err.println(ERROR_INVALID_SYNTAX);
         }
     }
 }

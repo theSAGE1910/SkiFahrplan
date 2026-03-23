@@ -10,6 +10,9 @@ package edu.kit.kastel;
  */
 public class QuitCommand implements Command {
 
+    private static final int MAX_ARGS_LENGTH = 1;
+    private static final String ERROR_TOO_MANY_ARGS = "Error, the quit command does not take any arguments.";
+
     /**
      * Executes the termination sequence by updating the session's running state.
      * It validates that no additional arguments were provided by the user before
@@ -20,8 +23,8 @@ public class QuitCommand implements Command {
      */
     @Override
     public void execute(String[] parts, SkiSession session) {
-        if (parts.length > 1) {
-            System.err.println("Error, the quit command does not take any arguments.");
+        if (parts.length > MAX_ARGS_LENGTH) {
+            System.err.println(ERROR_TOO_MANY_ARGS);
         } else {
             session.setRunning(false);
         }

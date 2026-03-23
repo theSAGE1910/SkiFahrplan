@@ -11,32 +11,33 @@ import java.io.IOException;
  */
 public class LoadCommand implements Command {
 
-    /**
-     * Attempts to construct a new ski area graph from the provided file path.
-     * If parsing is successful, it safely overwrites the currently active map and
-     * implicitly aborts any ongoing route to prevent spatial inconsistencies.
-     *
-     * @param parts the raw user input split by spaces
-     * @param session the current state context of the application
-     */
+    private static final int EXPECTED_ARGS_LENGTH = 3;
+    private static final int ARG_SUBCOMMAND_INDEX = 1;
+    private static final int ARG_PATH_INDEX = 2;
+    private static final int DEFAULT_ROUTE_INDEX = 0;
+
+    private static final String SUBCOMMAND_AREA = "area";
+    private static final String ERROR_FILE_NOT_FOUND = "Error, File not found";
+    private static final String ERROR_INVALID_SYNTAX = "Error, Invalid syntax.";
+
     @Override
     public void execute(String[] parts, SkiSession session) {
-        if (parts.length == 3 && parts[1].equals("area")) {
-            String filepath = parts[2];
+        if (parts.length == EXPECTED_ARGS_LENGTH && parts[ARG_SUBCOMMAND_INDEX].equals(SUBCOMMAND_AREA)) {
+            String filepath = parts[ARG_PATH_INDEX];
             try {
                 SkiArea parsedArea = AreaParser.parse(filepath);
 
                 if (parsedArea != null) {
                     session.setSkiArea(parsedArea);
                     session.setPlannedRoute(null);
-                    session.setCurrentRouteIndex(0);
+                    session.setCurrentRouteIndex(DEFAULT_ROUTE_INDEX);
                     session.setNextWasCalled(false);
                 }
             } catch (IOException e) {
-                System.err.println("Error, File not found");
+                System.err.println(ERROR_FILE_NOT_FOUND);
             }
         } else {
-            System.err.println("Error, Invalid syntax.");
+            System.err.println(ERROR_INVALID_SYNTAX);
         }
     }
 }

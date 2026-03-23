@@ -12,6 +12,25 @@ import java.util.Scanner;
  */
 public class CommandProcessor {
 
+    private static final String CMD_QUIT = "quit";
+    private static final String CMD_SET = "set";
+    private static final String CMD_LOAD = "load";
+    private static final String CMD_LIST = "list";
+    private static final String CMD_LIKE = "like";
+    private static final String CMD_DISLIKE = "dislike";
+    private static final String CMD_RESET = "reset";
+    private static final String CMD_PLAN = "plan";
+    private static final String CMD_SHOW = "show";
+    private static final String CMD_NEXT = "next";
+    private static final String CMD_TAKE = "take";
+    private static final String CMD_ALTERNATIVE = "alternative";
+    private static final String CMD_ABORT = "abort";
+
+    private static final String REGEX_SPACE = " ";
+    private static final String ERROR_UNKNOWN_COMMAND = "Error, Unknown command: ";
+
+    private static final int COMMAND_INDEX = 0;
+
     private final Map<String, Command> commands = new HashMap<>();
     private final SkiSession session;
 
@@ -24,19 +43,19 @@ public class CommandProcessor {
     public CommandProcessor(SkiArea skiArea, Skier skier) {
         this.session = new SkiSession(skiArea, skier);
 
-        commands.put("quit", new QuitCommand());
-        commands.put("set", new SetCommand());
-        commands.put("load", new LoadCommand());
-        commands.put("list", new ListCommand());
-        commands.put("like", new PreferenceCommand(true));
-        commands.put("dislike", new PreferenceCommand(false));
-        commands.put("reset", new ResetCommand());
-        commands.put("plan", new PlanCommand());
-        commands.put("show", new ShowCommand());
-        commands.put("next", new NextCommand());
-        commands.put("take", new TakeCommand());
-        commands.put("alternative", new AlternativeCommand());
-        commands.put("abort", new AbortCommand());
+        commands.put(CMD_QUIT, new QuitCommand());
+        commands.put(CMD_SET, new SetCommand());
+        commands.put(CMD_LOAD, new LoadCommand());
+        commands.put(CMD_LIST, new ListCommand());
+        commands.put(CMD_LIKE, new PreferenceCommand(true));
+        commands.put(CMD_DISLIKE, new PreferenceCommand(false));
+        commands.put(CMD_RESET, new ResetCommand());
+        commands.put(CMD_PLAN, new PlanCommand());
+        commands.put(CMD_SHOW, new ShowCommand());
+        commands.put(CMD_NEXT, new NextCommand());
+        commands.put(CMD_TAKE, new TakeCommand());
+        commands.put(CMD_ALTERNATIVE, new AlternativeCommand());
+        commands.put(CMD_ABORT, new AbortCommand());
     }
 
     /**
@@ -62,10 +81,10 @@ public class CommandProcessor {
      * @param line the raw command line string entered by the user
      */
     private void processCommands(String line) {
-        String[] parts = line.split(" ");
-        String commandKey = parts[0];
+        String[] parts = line.split(REGEX_SPACE);
+        String commandKey = parts[COMMAND_INDEX];
 
-        if (!commandKey.equals("next") && !commandKey.equals("take") && !commandKey.equals("alternative")) {
+        if (!commandKey.equals(CMD_NEXT) && !commandKey.equals(CMD_TAKE) && !commandKey.equals(CMD_ALTERNATIVE)) {
             session.setNextWasCalled(false);
         }
 
@@ -73,7 +92,7 @@ public class CommandProcessor {
         if (command != null) {
             command.execute(parts, session);
         } else {
-            System.err.println("Error, Unknown command: " + commandKey);
+            System.err.println(ERROR_UNKNOWN_COMMAND + commandKey);
         }
     }
 }

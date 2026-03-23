@@ -11,6 +11,10 @@ import java.time.LocalTime;
  * @version 0.1
  */
 public class RoutePlanner {
+
+    private static final int MIN_PATH_LENGTH_FOR_EVALUATION = 1;
+    private static final int COMPARE_LESS_THAN = 0;
+
     private final SkiArea area;
     private final Skier skier;
     private Route bestRoute = null;
@@ -104,7 +108,7 @@ public class RoutePlanner {
             }
         }
 
-        if (reachesBaseStation && currentRoute.getPath().size() > 1) {
+        if (reachesBaseStation && currentRoute.getPath().size() > MIN_PATH_LENGTH_FOR_EVALUATION) {
             evaluateAndSaveIfBest(currentRoute);
         }
 
@@ -179,7 +183,7 @@ public class RoutePlanner {
                 String newString = newRoute.getLexicographicalString();
                 String bestString = bestRoute.getLexicographicalString();
 
-                if (newString.compareTo(bestString) < 0) {
+                if (newString.compareTo(bestString) < COMPARE_LESS_THAN) {
                     bestRoute = newRoute;
                 }
             }

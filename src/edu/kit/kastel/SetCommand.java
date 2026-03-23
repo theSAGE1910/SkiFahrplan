@@ -10,6 +10,17 @@ package edu.kit.kastel;
  */
 public class SetCommand implements Command {
 
+    private static final int EXPECTED_ARGS_LENGTH = 3;
+    private static final int ARG_TYPE_INDEX = 1;
+    private static final int ARG_VALUE_INDEX = 2;
+
+    private static final String TYPE_SKILL = "skill";
+    private static final String TYPE_GOAL = "goal";
+
+    private static final String ERROR_INVALID_COMMAND = "Error, Invalid command";
+    private static final String ERROR_INVALID_SKILL = "Error, Invalid skill level";
+    private static final String ERROR_INVALID_GOAL = "Error, Invalid goal name";
+
     /**
      * Executes the profile update logic. Parses the requested skill or goal from
      * the user input and applies it to the active skier object, dynamically replanning
@@ -20,33 +31,33 @@ public class SetCommand implements Command {
      */
     @Override
     public void execute(String[] parts, SkiSession session) {
-        if (parts.length != 3) {
-            System.err.println("Error, Invalid command");
+        if (parts.length != EXPECTED_ARGS_LENGTH) {
+            System.err.println(ERROR_INVALID_COMMAND);
             return;
         }
 
-        if (parts[1].equals("skill")) {
+        if (parts[ARG_TYPE_INDEX].equals(TYPE_SKILL)) {
             for (SkillLevel skill : SkillLevel.values()) {
-                if (skill.name().equals(parts[2])) {
+                if (skill.name().equals(parts[ARG_VALUE_INDEX])) {
                     session.getSkier().setSkillLevel(skill);
                     session.triggerDynamicReplan();
                     return;
                 }
             }
-            System.err.println("Error, Invalid skill level");
+            System.err.println(ERROR_INVALID_SKILL);
 
-        } else if (parts[1].equals("goal")) {
+        } else if (parts[ARG_TYPE_INDEX].equals(TYPE_GOAL)) {
             for (Goal goal : Goal.values()) {
-                if (goal.name().equals(parts[2])) {
+                if (goal.name().equals(parts[ARG_VALUE_INDEX])) {
                     session.getSkier().setGoal(goal);
                     session.triggerDynamicReplan();
                     return;
                 }
             }
-            System.err.println("Error, Invalid goal name");
+            System.err.println(ERROR_INVALID_GOAL);
 
         } else {
-            System.err.println("Error, Invalid command");
+            System.err.println(ERROR_INVALID_COMMAND);
         }
     }
 }

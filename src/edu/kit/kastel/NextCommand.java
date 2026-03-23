@@ -10,27 +10,24 @@ package edu.kit.kastel;
  */
 public class NextCommand implements Command {
 
-    /**
-     * Outputs the identifier of the next scheduled lift or piste. If the skier has
-     * already reached the final destination base station, it formally concludes
-     * the route and clears the planning state.
-     *
-     * @param parts the raw user input split by spaces
-     * @param session the current state context of the application
-     */
+    private static final int EXPECTED_ARGS_LENGTH = 1;
+    private static final String ERROR_INVALID_ARGS = "Error, next takes no arguments.";
+    private static final String ERROR_NO_ROUTE = "Error, No route planned.";
+    private static final String MSG_FINISHED = "route finished!";
+
     @Override
     public void execute(String[] parts, SkiSession session) {
-        if (parts.length != 1) {
-            System.err.println("Error, next takes no arguments.");
+        if (parts.length != EXPECTED_ARGS_LENGTH) {
+            System.err.println(ERROR_INVALID_ARGS);
             return;
         }
         if (session.getPlannedRoute() == null) {
-            System.err.println("Error, No route planned.");
+            System.err.println(ERROR_NO_ROUTE);
             return;
         }
 
         if (session.getCurrentRouteIndex() >= session.getRouteEndIndex()) {
-            System.out.println("route finished!");
+            System.out.println(MSG_FINISHED);
             session.setPlannedRoute(null);
             session.setNextWasCalled(false);
         } else {

@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +34,32 @@ public final class AreaParser {
     private static final Pattern EDGE_PATTERN =
         Pattern.compile("^([a-zA-Z0-9_]+)\\s*-->\\s*([a-zA-Z0-9_]+)$");
 
+    private static final String GRAPH_KEYWORD = "graph";
+    private static final String ERROR_FILE_START = "Error, File must start with 'graph'";
+    private static final String ERROR_INVALID_AREA = "Error, Invalid Area configuration.";
+    private static final String ERROR_INVALID_LINE = "Error, Invalid line format";
+    private static final String ERROR_INVALID_TIME = "Error, Invalid time value provided";
+    private static final String ERROR_LIFT_TIME = "Error, Lift start time must be before end time";
+    private static final String ERROR_PISTE_DIMENSIONS = "Error, Piste length must be > 0 and altitude >= 0";
+
+    private static final int GROUP_ID = 1;
+
+    private static final int LIFT_GROUP_TYPE = 2;
+    private static final int LIFT_GROUP_START_TIME = 3;
+    private static final int LIFT_GROUP_END_TIME = 4;
+    private static final int LIFT_GROUP_RIDE_DURATION = 5;
+    private static final int LIFT_GROUP_WAIT_TIME = 6;
+
+    private static final int PISTE_GROUP_DIFFICULTY = 2;
+    private static final int PISTE_GROUP_SURFACE = 3;
+    private static final int PISTE_GROUP_LENGTH = 4;
+    private static final int PISTE_GROUP_ALTITUDE = 5;
+
+    private static final int EDGE_GROUP_FROM = 1;
+    private static final int EDGE_GROUP_TO = 2;
+
+    private static final int MINIMUM_VALID_VALUE = 0;
+
     private AreaParser() {
     }
 
@@ -51,8 +78,8 @@ public final class AreaParser {
             System.out.println(line);
         }
 
-        if (lines.isEmpty() || !lines.getFirst().strip().equals("graph")) {
-            System.err.println("Error, File must start with 'graph'");
+        if (lines.isEmpty() || !lines.getFirst().strip().equals(GRAPH_KEYWORD)) {
+            System.err.println(ERROR_FILE_START);
             return null;
         }
 
@@ -60,19 +87,18 @@ public final class AreaParser {
 
         for (String line : lines) {
             String stripped = line.strip();
-            if (stripped.isEmpty() || stripped.equals("graph")) {
+            if (stripped.isEmpty() || stripped.equals(GRAPH_KEYWORD)) {
                 continue;
             }
 
             boolean success = parseLine(stripped, newArea);
             if (!success) {
-                System.err.println("Error, Invalid line format");
                 return null;
             }
         }
 
         if (!validateArea(newArea)) {
-            System.err.println("Error, Invalid Area configuration.");
+            System.err.println(ERROR_INVALID_AREA);
             return null;
         }
 
@@ -85,66 +111,68 @@ public final class AreaParser {
             if (transitMatcher.matches()) {
                 Lift lift = createLift(transitMatcher, true);
                 if (lift == null) {
+                    System.err.println(ERROR_LIFT_TIME);
                     return false;
                 }
-                newArea.addNode(lift);
-                return true;
+                return newArea.addNode(lift);
             }
 
             Matcher regularMatcher = REGULAR_LIFT_PATTERN.matcher(line);
             if (regularMatcher.matches()) {
                 Lift lift = createLift(regularMatcher, false);
                 if (lift == null) {
+                    System.err.println(ERROR_LIFT_TIME);
                     return false;
                 }
-                newArea.addNode(lift);
-                return true;
+                return newArea.addNode(lift);
             }
 
             Matcher pisteMatcher = PISTE_PATTERN.matcher(line);
             if (pisteMatcher.matches()) {
                 Piste piste = createPiste(pisteMatcher);
                 if (piste == null) {
+                    System.err.println(ERROR_PISTE_DIMENSIONS);
                     return false;
                 }
-                newArea.addNode(piste);
-                return true;
+                return newArea.addNode(piste);
             }
 
             Matcher edgeMatcher = EDGE_PATTERN.matcher(line);
             if (edgeMatcher.matches()) {
-                newArea.addEdges(edgeMatcher.group(1), edgeMatcher.group(2));
-                return true;
+                return newArea.addEdges(edgeMatcher.group(EDGE_GROUP_FROM), edgeMatcher.group(EDGE_GROUP_TO));
             }
         } catch (DateTimeParseException e) {
+            System.err.println(ERROR_INVALID_TIME);
             return false;
         }
+
+        System.err.println(ERROR_INVALID_LINE);
         return false;
     }
 
-    private static Lift createLift(Matcher matcher, boolean isTransit) {
-        String id = matcher.group(1);
-        LiftType type = LiftType.valueOf(matcher.group(2));
-        LocalTime startTime = LocalTime.parse(matcher.group(3));
-        LocalTime endTime = LocalTime.parse(matcher.group(4));
+    private static Lift createLift(MatchResult matcher, boolean isTransit) {
+        String id = matcher.group(GROUP_ID);
+        LiftType type = LiftType.valueOf(matcher.group(LIFT_GROUP_TYPE));
+        LocalTime startTime = LocalTime.parse(matcher.group(LIFT_GROUP_START_TIME));
+        LocalTime endTime = LocalTime.parse(matcher.group(LIFT_GROUP_END_TIME));
 
         if (!startTime.isBefore(endTime)) {
             return null;
         }
 
-        int rideDuration = Integer.parseInt(matcher.group(5));
-        int waitTime = Integer.parseInt(matcher.group(6));
+        int rideDuration = Integer.parseInt(matcher.group(LIFT_GROUP_RIDE_DURATION));
+        int waitTime = Integer.parseInt(matcher.group(LIFT_GROUP_WAIT_TIME));
         return new Lift(id, type, startTime, endTime, rideDuration, waitTime, isTransit);
     }
 
-    private static Piste createPiste(Matcher matcher) {
-        String id = matcher.group(1);
-        Difficulty diff = Difficulty.valueOf(matcher.group(2));
-        Surface surf = Surface.valueOf(matcher.group(3));
-        int length = Integer.parseInt(matcher.group(4));
-        int altitude = Integer.parseInt(matcher.group(5));
+    private static Piste createPiste(MatchResult matcher) {
+        String id = matcher.group(GROUP_ID);
+        Difficulty diff = Difficulty.valueOf(matcher.group(PISTE_GROUP_DIFFICULTY));
+        Surface surf = Surface.valueOf(matcher.group(PISTE_GROUP_SURFACE));
+        int length = Integer.parseInt(matcher.group(PISTE_GROUP_LENGTH));
+        int altitude = Integer.parseInt(matcher.group(PISTE_GROUP_ALTITUDE));
 
-        if (length <= 0 || altitude < 0) {
+        if (length <= MINIMUM_VALID_VALUE || altitude < MINIMUM_VALID_VALUE) {
             return null;
         }
 
