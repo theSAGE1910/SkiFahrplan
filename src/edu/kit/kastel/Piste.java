@@ -108,6 +108,6 @@ public class Piste implements SkiNode {
         double multipliers = mDifficulty * mSurface * (1.0 + GRADIENT_MULTIPLIER * gradient) * mSkill;
         double timeInSeconds = (this.length / BASE_SPEED_DIVISOR) * multipliers;
 
-        return (int) Math.ceil(timeInSeconds);
+        return (int) Math.round(timeInSeconds);
     }
 }

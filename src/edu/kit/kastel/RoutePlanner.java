@@ -53,8 +53,6 @@ public class RoutePlanner {
 
     /**
      * Dynamically recalculates the optimal route from the skier's current position and time.
-     * This is used when the skier's preferences, skill level, or goal change while a route
-     * is already active.
      *
      * @param currentRouteSoFar the truncated history of the route taken so far
      * @param endTime the strict deadline by which the skier must return to a base station
@@ -87,26 +85,26 @@ public class RoutePlanner {
      *
      * @param currentRoute the path and times accumulated so far
      * @param endTime the strict deadline to finish the route
-     * @param forbiddenNode a specific node to avoid at a certain depth (used for alternatives)
+     * @param forbiddenNode a specific node to avoid at a certain depth
      * @param avoidDepth the exact path size at which the forbidden node must be avoided
      */
     private void findBestRoute(Route currentRoute, LocalTime endTime, SkiNode forbiddenNode, int avoidDepth) {
         SkiNode currentNode = currentRoute.getCurrentNode();
 
-//        boolean reachesBaseStation = false;
-//
-//        for (SkiNode nextNode : area.getConnections(currentNode)) {
-//            if (currentRoute.getPath().size() == avoidDepth && nextNode.equals(forbiddenNode)) {
-//                continue;
-//            }
-//
-//            if (nextNode instanceof Lift && ((Lift) nextNode).isBaseStation()) {
-//                reachesBaseStation = true;
-//                break;
-//            }
-//        }
+        boolean reachesBaseStation = false;
 
-        if (currentNode instanceof Lift && ((Lift) currentNode).isBaseStation() && currentRoute.getPath().size() > 1) {
+        for (SkiNode nextNode : area.getConnections(currentNode)) {
+            if (currentRoute.getPath().size() == avoidDepth && nextNode.equals(forbiddenNode)) {
+                continue;
+            }
+
+            if (nextNode instanceof Lift && ((Lift) nextNode).isBaseStation()) {
+                reachesBaseStation = true;
+                break;
+            }
+        }
+
+        if (reachesBaseStation && currentRoute.getPath().size() > 1) {
             evaluateAndSaveIfBest(currentRoute);
         }
 
@@ -155,8 +153,6 @@ public class RoutePlanner {
 
     /**
      * Evaluates a completed route against the current best route.
-     * Overwrites the best route if the new route has a higher utility score,
-     * a better preference score, or a lexicographically superior path in case of a tie.
      *
      * @param newRoute the newly completed valid route to evaluate
      */
