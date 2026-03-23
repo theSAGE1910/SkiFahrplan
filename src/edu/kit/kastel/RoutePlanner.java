@@ -14,6 +14,7 @@ public class RoutePlanner {
 
     private static final int MIN_PATH_LENGTH_FOR_EVALUATION = 1;
     private static final int COMPARE_LESS_THAN = 0;
+    private static final int INDEX_FIRST = 0;
 
     private final SkiArea area;
     private final Skier skier;
@@ -96,13 +97,14 @@ public class RoutePlanner {
         SkiNode currentNode = currentRoute.getCurrentNode();
 
         boolean reachesBaseStation = false;
+        SkiNode startNode = currentRoute.getPath().get(INDEX_FIRST);
 
         for (SkiNode nextNode : area.getConnections(currentNode)) {
             if (currentRoute.getPath().size() == avoidDepth && nextNode.equals(forbiddenNode)) {
                 continue;
             }
 
-            if (nextNode instanceof Lift && ((Lift) nextNode).isBaseStation()) {
+            if (nextNode.equals(startNode)) {
                 reachesBaseStation = true;
                 break;
             }

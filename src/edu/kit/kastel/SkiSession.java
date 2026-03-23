@@ -11,6 +11,11 @@ import java.time.LocalTime;
  * @version 0.1
  */
 public class SkiSession {
+
+    private static final int ROUTE_INDEX_START = 0;
+    private static final int TRUNCATION_OFFSET = 1;
+    private static final int EMPTY_ROUTE_LENGTH = 0;
+
     private SkiArea skiArea;
     private final Skier skier;
     private boolean running;
@@ -32,7 +37,7 @@ public class SkiSession {
         this.skier = skier;
         this.running = true;
         this.plannedRoute = null;
-        this.currentRouteIndex = 0;
+        this.currentRouteIndex = ROUTE_INDEX_START;
         this.nextWasCalled = false;
     }
 
@@ -42,7 +47,7 @@ public class SkiSession {
      */
     public void triggerDynamicReplan() {
         if (plannedRoute != null) {
-            int truncatedIndex = Math.max(0, currentRouteIndex - 1);
+            int truncatedIndex = Math.max(ROUTE_INDEX_START, currentRouteIndex - TRUNCATION_OFFSET);
             Route truncated = plannedRoute.getTruncatedRoute(truncatedIndex);
 
             RoutePlanner planner = new RoutePlanner(this.skiArea, this.skier);
@@ -52,7 +57,7 @@ public class SkiSession {
                 this.plannedRoute = newRoute;
             } else {
                 this.plannedRoute = null;
-                this.currentRouteIndex = 0;
+                this.currentRouteIndex = ROUTE_INDEX_START;
                 this.nextWasCalled = false;
             }
         }
@@ -65,7 +70,7 @@ public class SkiSession {
      */
     public int getRouteEndIndex() {
         if (plannedRoute == null) {
-            return 0;
+            return EMPTY_ROUTE_LENGTH;
         }
 
         int endIndex = plannedRoute.getPath().size();

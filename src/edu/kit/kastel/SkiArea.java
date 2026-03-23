@@ -15,6 +15,10 @@ import java.util.ArrayList;
  */
 public class SkiArea {
 
+    private static final String ERROR_NODE_EXISTS_PREFIX = "Error, Node with id ";
+    private static final String ERROR_NODE_EXISTS_SUFFIX = " already exists";
+    private static final String ERROR_NODE_NOT_EXIST = "Error, Node does not exist";
+
     private final Map<SkiNode, List<SkiNode>> connections;
     private final Map<String, SkiNode> nodesById;
 
@@ -35,7 +39,7 @@ public class SkiArea {
      */
     public boolean addNode(SkiNode node) {
         if (this.nodesById.containsKey(node.getId())) {
-            System.err.println("Error, Node with id " + node.getId() + " already exists");
+            System.err.println(ERROR_NODE_EXISTS_PREFIX + node.getId() + ERROR_NODE_EXISTS_SUFFIX);
             return false;
         }
         this.nodesById.put(node.getId(), node);
@@ -56,7 +60,7 @@ public class SkiArea {
         SkiNode toNode = this.nodesById.get(toId);
 
         if (fromNode == null || toNode == null) {
-            System.err.println("Error, Node does not exist");
+            System.err.println(ERROR_NODE_NOT_EXIST);
             return false;
         }
         connections.get(fromNode).add(toNode);

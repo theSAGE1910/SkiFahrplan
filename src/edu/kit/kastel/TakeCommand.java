@@ -10,6 +10,13 @@ package edu.kit.kastel;
  */
 public class TakeCommand implements Command {
 
+    private static final int EXPECTED_ARGS_LENGTH = 1;
+    private static final int ROUTE_STEP_SIZE = 1;
+
+    private static final String ERROR_INVALID_ARGS = "Error, take takes no arguments.";
+    private static final String ERROR_NO_ROUTE_OR_FINISHED = "Error, No route planned or route already finished.";
+    private static final String ERROR_MISSING_NEXT = "Error, take must be called immediately after next.";
+
     /**
      * Executes the progression step by incrementing the skier's current position index.
      * Enforces the strict rule that this action can only occur immediately after
@@ -20,20 +27,20 @@ public class TakeCommand implements Command {
      */
     @Override
     public void execute(String[] parts, SkiSession session) {
-        if (parts.length != 1) {
-            System.err.println("Error, take takes no arguments.");
+        if (parts.length != EXPECTED_ARGS_LENGTH) {
+            System.err.println(ERROR_INVALID_ARGS);
             return;
         }
         if (session.getPlannedRoute() == null || session.getCurrentRouteIndex() >= session.getRouteEndIndex()) {
-            System.err.println("Error, No route planned or route already finished.");
+            System.err.println(ERROR_NO_ROUTE_OR_FINISHED);
             return;
         }
         if (!session.isNextWasCalled()) {
-            System.err.println("Error, take must be called immediately after next.");
+            System.err.println(ERROR_MISSING_NEXT);
             return;
         }
 
-        session.setCurrentRouteIndex(session.getCurrentRouteIndex() + 1);
+        session.setCurrentRouteIndex(session.getCurrentRouteIndex() + ROUTE_STEP_SIZE);
         session.setNextWasCalled(false);
     }
 }
