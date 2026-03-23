@@ -93,29 +93,25 @@ public class RoutePlanner {
     private void findBestRoute(Route currentRoute, LocalTime endTime, SkiNode forbiddenNode, int avoidDepth) {
         SkiNode currentNode = currentRoute.getCurrentNode();
 
-        boolean reachesBaseStation = false;
+//        boolean reachesBaseStation = false;
+//
+//        for (SkiNode nextNode : area.getConnections(currentNode)) {
+//            if (currentRoute.getPath().size() == avoidDepth && nextNode.equals(forbiddenNode)) {
+//                continue;
+//            }
+//
+//            if (nextNode instanceof Lift && ((Lift) nextNode).isBaseStation()) {
+//                reachesBaseStation = true;
+//                break;
+//            }
+//        }
 
-        for (SkiNode nextNode : area.getConnections(currentNode)) {
-            if (currentRoute.getPath().size() == avoidDepth && nextNode.equals(forbiddenNode)) {
-                continue;
-            }
-
-            if (nextNode instanceof Lift && ((Lift) nextNode).isBaseStation()) {
-                reachesBaseStation = true;
-                break;
-            }
-        }
-
-        if (reachesBaseStation && currentRoute.getPath().size() > 1) {
+        if (currentNode instanceof Lift && ((Lift) currentNode).isBaseStation() && currentRoute.getPath().size() > 1) {
             evaluateAndSaveIfBest(currentRoute);
         }
 
         for (SkiNode nextNode : area.getConnections(currentNode)) {
             if (currentRoute.getPath().size() == avoidDepth && nextNode.equals(forbiddenNode)) {
-                continue;
-            }
-
-            if (currentRoute.getPath().contains(nextNode)) {
                 continue;
             }
 

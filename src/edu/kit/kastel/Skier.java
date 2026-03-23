@@ -22,7 +22,7 @@ public class Skier {
 
     /**
      * Constructs a new {@code Skier} with empty preference sets.
-     * The skill level and goal remain uninitialized until explicitly set.
+     * The skill level and goal remain uninitialized until explicitly set by the user.
      */
     public Skier() {
         this.likedDifficulties = new HashSet<>();
@@ -32,16 +32,17 @@ public class Skier {
     }
 
     /**
-     * Gets the current skill level of this skier.
+     * Retrieves the current skill level of this skier.
      *
-     * @return the active skill level
+     * @return the active proficiency classification
      */
     public SkillLevel getSkillLevel() {
         return skillLevel;
     }
 
     /**
-     * Sets the proficiency level of this skier.
+     * Updates the proficiency level of this skier. This affects how travel times
+     * are mathematically calculated during route planning.
      *
      * @param skillLevel the new {@link SkillLevel} to assign
      */
@@ -50,16 +51,17 @@ public class Skier {
     }
 
     /**
-     * Gets the active optimization goal for this skier's route planning.
+     * Retrieves the active optimization goal for this skier's route planning.
      *
-     * @return the current route planning goal
+     * @return the current route planning metric
      */
     public Goal getGoal() {
         return goal;
     }
 
     /**
-     * Sets the optimization goal for this skier's route planner.
+     * Updates the optimization goal for this skier's route planner. This dictates
+     * which utility metric the routing algorithm attempts to maximize.
      *
      * @param goal the new {@link Goal} to assign
      */
@@ -68,25 +70,25 @@ public class Skier {
     }
 
     /**
-     * Adds a specific difficulty to the skier's positive preferences.
+     * Registers a specific difficulty to the skier's positive preferences.
      *
-     * @param difficulty the {@link Difficulty} the skier likes
+     * @param difficulty the {@link Difficulty} the skier explicitly likes
      */
     public void addLikedDifficulty(Difficulty difficulty) {
         likedDifficulties.add(difficulty);
     }
 
     /**
-     * Adds a specific difficulty to the skier's negative preferences.
+     * Registers a specific difficulty to the skier's negative preferences.
      *
-     * @param difficulty the {@link Difficulty} the skier wants to avoid
+     * @param difficulty the {@link Difficulty} the skier explicitly wants to avoid
      */
     public void addDislikedDifficulty(Difficulty difficulty) {
         dislikedDifficulties.add(difficulty);
     }
 
     /**
-     * Checks if the skier has a recorded positive preference for the specified difficulty.
+     * Evaluates if the skier has a recorded positive preference for the specified difficulty.
      *
      * @param difficulty the difficulty level to check
      * @return {@code true} if the skier likes the difficulty, {@code false} otherwise
@@ -96,7 +98,7 @@ public class Skier {
     }
 
     /**
-     * Checks if the skier has a recorded negative preference for the specified difficulty.
+     * Evaluates if the skier has a recorded negative preference for the specified difficulty.
      *
      * @param difficulty the difficulty level to check
      * @return {@code true} if the skier dislikes the difficulty, {@code false} otherwise
@@ -106,25 +108,25 @@ public class Skier {
     }
 
     /**
-     * Adds a specific surface condition to the skier's positive preferences.
+     * Registers a specific surface condition to the skier's positive preferences.
      *
-     * @param surface the {@link Surface} condition the skier likes
+     * @param surface the {@link Surface} condition the skier explicitly likes
      */
     public void addLikedSurface(Surface surface) {
         likedSurfaces.add(surface);
     }
 
     /**
-     * Adds a specific surface condition to the skier's negative preferences.
+     * Registers a specific surface condition to the skier's negative preferences.
      *
-     * @param surface the {@link Surface} condition the skier wants to avoid
+     * @param surface the {@link Surface} condition the skier explicitly wants to avoid
      */
     public void addDislikedSurface(Surface surface) {
         dislikedSurfaces.add(surface);
     }
 
     /**
-     * Checks if the skier has a recorded positive preference for the specified surface condition.
+     * Evaluates if the skier has a recorded positive preference for the specified surface condition.
      *
      * @param surface the surface condition to check
      * @return {@code true} if the skier likes the surface, {@code false} otherwise
@@ -134,7 +136,7 @@ public class Skier {
     }
 
     /**
-     * Checks if the skier has a recorded negative preference for the specified surface condition.
+     * Evaluates if the skier has a recorded negative preference for the specified surface condition.
      *
      * @param surface the surface condition to check
      * @return {@code true} if the skier dislikes the surface, {@code false} otherwise
@@ -144,8 +146,8 @@ public class Skier {
     }
 
     /**
-     * Clears all stored positive and negative preferences for both difficulties and surface conditions.
-     * This resets the skier to a neutral preference state.
+     * Wipes all stored positive and negative preferences for both difficulties and surface conditions.
+     * This resets the skier to a completely neutral preference state.
      */
     public void resetPreferences() {
         likedDifficulties.clear();

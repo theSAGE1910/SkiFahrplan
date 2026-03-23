@@ -9,15 +9,15 @@ import java.util.Set;
 /**
  * Represents a planned or taken route through the ski area.
  * This class tracks the sequence of {@link SkiNode} instances visited and the corresponding
- * arrival times at each node. It also provides functionality to calculate the route's utility
- * and preference scores based on a skier's specific goals and preferences.
+ * arrival times at each node. It provides functionality to calculate the route's utility
+ * and preference scores based on a skier's specific goals.
  *
  * @author uxuwg
  * @version 0.1
  */
 public class Route {
     private final List<SkiNode> path;
-    private final List<LocalTime> times = new ArrayList<>();
+    private final List<LocalTime> times;
 
     /**
      * Constructs a new initial {@code Route} starting at the specified node and time.
@@ -27,6 +27,7 @@ public class Route {
      */
     public Route(SkiNode startNode, LocalTime startTime) {
         this.path = new ArrayList<>();
+        this.times = new ArrayList<>();
         this.path.add(startNode);
         this.times.add(startTime);
     }
@@ -40,31 +41,31 @@ public class Route {
      */
     public Route(Route previousRoute, SkiNode nextNode, LocalTime newTime) {
         this.path = new ArrayList<>(previousRoute.path);
-        this.times.addAll(previousRoute.times);
+        this.times = new ArrayList<>(previousRoute.times);
         this.path.add(nextNode);
         this.times.add(newTime);
     }
 
     /**
-     * Gets the sequence of nodes that make up this route.
+     * Retrieves the sequence of nodes that make up this route.
      *
-     * @return a list of nodes representing the path
+     * @return an ordered list of nodes representing the path
      */
     public List<SkiNode> getPath() {
         return path;
     }
 
     /**
-     * Gets the arrival time at the final node currently in the route.
+     * Retrieves the arrival time at the final node currently in the route.
      *
-     * @return the current time at the end of the route
+     * @return the accumulated time at the end of the route
      */
     public LocalTime getCurrentTime() {
         return this.times.get(this.times.size() - 1);
     }
 
     /**
-     * Gets the final node currently at the end of the route.
+     * Retrieves the final node currently at the end of the route.
      *
      * @return the current node the skier is located at
      */
@@ -104,17 +105,16 @@ public class Route {
 
         for (SkiNode node : path) {
             if (node instanceof Piste piste) {
-
-                if (goal == Goal.ALTITUDE) {
-                    score += piste.getAltitudeDifference();
-                } else if (goal == Goal.DISTANCE) {
-                    score += piste.getLength();
-                } else if (goal == Goal.NUMBER) {
-                    score += 1;
-                } else if (goal == Goal.UNIQUE) {
-                    if (uniquePistes.add(piste)) {
-                        score += 1;
+                switch (goal) {
+                    case ALTITUDE -> score += piste.getAltitudeDifference();
+                    case DISTANCE -> score += piste.getLength();
+                    case NUMBER -> score += 1;
+                    case UNIQUE -> {
+                        if (uniquePistes.add(piste)) {
+                            score += 1;
+                        }
                     }
+                    default -> System.err.println("Unexpected value: " + goal);
                 }
             }
         }

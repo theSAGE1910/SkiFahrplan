@@ -3,12 +3,15 @@ package edu.kit.kastel;
 /**
  * Represents a ski piste (slope) in the ski area graph.
  * A piste connects different nodes and has specific physical attributes such as
- * length, altitude difference, difficulty, and surface condition.
+ * length, altitude difference, difficulty, and surface condition, which dictate travel time.
  *
  * @author uxuwg
  * @version 0.1
  */
 public class Piste implements SkiNode {
+
+    private static final double BASE_SPEED_DIVISOR = 8.0;
+    private static final double GRADIENT_MULTIPLIER = 2.0;
 
     private final String id;
     private final Difficulty difficulty;
@@ -17,13 +20,13 @@ public class Piste implements SkiNode {
     private final int altitudeDifference;
 
     /**
-     * Constructs a new {@code Piste} with the specified attributes.
+     * Constructs a new {@code Piste} with the specified physical attributes.
      *
      * @param id the unique identifier of the piste
      * @param difficulty the {@link Difficulty} level of the piste
      * @param surface the {@link Surface} condition of the piste
      * @param length the length of the piste in meters
-     * @param altitudeDifference ornate the altitude difference between the start and end of the piste in meters
+     * @param altitudeDifference the altitude difference between the start and end of the piste in meters
      */
     public Piste(String id, Difficulty difficulty, Surface surface, int length, int altitudeDifference) {
         this.id = id;
@@ -33,45 +36,40 @@ public class Piste implements SkiNode {
         this.altitudeDifference = altitudeDifference;
     }
 
-    /**
-     * Gets the unique identifier of this piste.
-     *
-     * @return the piste identifier as a string
-     */
     @Override
     public String getId() {
         return this.id;
     }
 
     /**
-     * Gets the difficulty level of this piste.
+     * Retrieves the difficulty level of this piste.
      *
-     * @return the difficulty level
+     * @return the difficulty classification (e.g., BLUE, RED, BLACK)
      */
     public Difficulty getDifficulty() {
         return difficulty;
     }
 
     /**
-     * Gets the surface condition of this piste.
+     * Retrieves the surface condition of this piste.
      *
-     * @return the surface condition
+     * @return the physical surface state (e.g., ICY, BUMPY)
      */
     public Surface getSurface() {
         return surface;
     }
 
     /**
-     * Gets the total length of this piste.
+     * Retrieves the total physical length of this piste.
      *
-     * @return the length in meters
+     * @return the distance in meters
      */
     public int getLength() {
         return length;
     }
 
     /**
-     * Gets the difference in altitude between the start and end of this piste.
+     * Retrieves the vertical drop of this piste.
      *
      * @return the altitude difference in meters
      */
@@ -84,11 +82,10 @@ public class Piste implements SkiNode {
      * The calculation factors in the piste's length, gradient, difficulty, surface condition,
      * and the skier's specific skill level according to the defined mathematical formula.
      *
-     * @param skill the {@link SkillLevel} of the skier evaluating the piste
+     * @param skill the {@link SkillLevel} of the skier navigating the piste
      * @return the calculated travel time in seconds, rounded up to the nearest whole second
      */
     public int calculateTravelTime(SkillLevel skill) {
-
         double mDifficulty = switch (this.difficulty) {
             case BLUE -> 1.00;
             case RED -> 1.15;
@@ -108,8 +105,8 @@ public class Piste implements SkiNode {
         };
 
         double gradient = (double) this.altitudeDifference / this.length;
-        double multipliers = mDifficulty * mSurface * (1.0 + 2.0 * gradient) * mSkill;
-        double timeInSeconds = (this.length / 8.0) * multipliers;
+        double multipliers = mDifficulty * mSurface * (1.0 + GRADIENT_MULTIPLIER * gradient) * mSkill;
+        double timeInSeconds = (this.length / BASE_SPEED_DIVISOR) * multipliers;
 
         return (int) Math.ceil(timeInSeconds);
     }
