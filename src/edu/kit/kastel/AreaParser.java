@@ -5,7 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,13 +25,13 @@ import java.util.regex.Pattern;
 public final class AreaParser {
 
     private static final Pattern TRANSIT_LIFT_PATTERN =
-            Pattern.compile("^([a-zA-Z0-9_]+)\\[\\[\\1<br/>(GONDOLA|CHAIRLIFT);(\\d{2}:\\d{2});(\\d{2}:\\d{2});(\\d+);(\\d+)]]$");
+        Pattern.compile("^([a-zA-Z0-9_]+)\\[\\[\\1<br/>(GONDOLA|CHAIRLIFT);(\\d{2}:\\d{2});(\\d{2}:\\d{2});(\\d+);(\\d+)]]$");
     private static final Pattern REGULAR_LIFT_PATTERN =
-            Pattern.compile("^([a-zA-Z0-9_]+)\\[\\1<br/>(GONDOLA|CHAIRLIFT);(\\d{2}:\\d{2});(\\d{2}:\\d{2});(\\d+);(\\d+)]$");
+        Pattern.compile("^([a-zA-Z0-9_]+)\\[\\1<br/>(GONDOLA|CHAIRLIFT);(\\d{2}:\\d{2});(\\d{2}:\\d{2});(\\d+);(\\d+)]$");
     private static final Pattern PISTE_PATTERN =
-            Pattern.compile("^([a-zA-Z0-9_]+)\\(\\[\\1<br/>(BLUE|RED|BLACK);(REGULAR|ICY|BUMPY);(\\d+);(\\d+)]\\)$");
+        Pattern.compile("^([a-zA-Z0-9_]+)\\(\\[\\1<br/>(BLUE|RED|BLACK);(REGULAR|ICY|BUMPY);(\\d+);(\\d+)]\\)$");
     private static final Pattern EDGE_PATTERN =
-            Pattern.compile("^([a-zA-Z0-9_]+)\\s*-->\\s*([a-zA-Z0-9_]+)$");
+        Pattern.compile("^([a-zA-Z0-9_]+)\\s*-->\\s*([a-zA-Z0-9_]+)$");
 
     private AreaParser() {
     }
@@ -35,57 +41,95 @@ public final class AreaParser {
      * The file must begin with the keyword "graph".
      *
      * @param filepath the path to the text file containing the ski area definition
-     * @return the fully constructed {@link SkiArea} containing all parsed nodes and edges
-     * @throws IOException if an I/O error occurs reading from the file or a malformed or unmappable byte sequence is read
+     * @return the fully constructed {@link SkiArea}, or {@code null} if the file contains invalid formatting
+     * @throws IOException if an I/O error occurs reading from the file
      */
     public static SkiArea parse(String filepath) throws IOException {
 
         Path path = Paths.get(filepath);
         List<String> lines = Files.readAllLines(path);
 
-        SkiArea newArea = new SkiArea();
-
-        if (lines.isEmpty() || !lines.getFirst().equals("graph")) {
-            System.err.println("Error: File must start with 'graph'");
-        }
-
         for (String line : lines) {
             System.out.println(line);
+        }
 
-            if (!line.strip().equals("graph")) {
-                parseLine(line.strip(), newArea);
+        if (lines.isEmpty() || !lines.getFirst().strip().equals("graph")) {
+            System.err.println("Error, File must start with 'graph'");
+            return null;
+        }
+
+        SkiArea newArea = new SkiArea();
+        Set<String> seenIds = new HashSet<>();
+
+        for (String line : lines) {
+            String stripped = line.strip();
+            if (stripped.isEmpty() || stripped.equals("graph")) {
+                continue;
             }
+
+            boolean success = parseLine(stripped, newArea, seenIds);
+            if (!success) {
+                System.err.println("Error, Invalid line format");
+                return null;
+            }
+        }
+
+        if (!validateArea(newArea)) {
+            System.err.println("Error, Invalid Area configuration.");
+            return null;
         }
 
         return newArea;
     }
 
-    private static void parseLine(String line, SkiArea newArea) {
-        Matcher transitMatcher = TRANSIT_LIFT_PATTERN.matcher(line);
-        if (transitMatcher.matches()) {
-            newArea.addNode(createLift(transitMatcher, true));
-            return;
+    private static boolean parseLine(String line, SkiArea newArea,  Set<String> seenIds) {
+        try {
+            Matcher transitMatcher = TRANSIT_LIFT_PATTERN.matcher(line);
+            if (transitMatcher.matches()) {
+
+                String transitId = transitMatcher.group(1);
+                if (!seenIds.add(transitId)) {
+                    return false;
+                }
+
+                newArea.addNode(createLift(transitMatcher, true));
+                return true;
+            }
+
+            Matcher regularMatcher = REGULAR_LIFT_PATTERN.matcher(line);
+            if (regularMatcher.matches()) {
+
+                String regularId = regularMatcher.group(1);
+                if (!seenIds.add(regularId)) {
+                    return false;
+                }
+
+                newArea.addNode(createLift(regularMatcher, false));
+                return true;
+            }
+
+            Matcher pisteMatcher = PISTE_PATTERN.matcher(line);
+            if (pisteMatcher.matches()) {
+
+                String pisteId = pisteMatcher.group(1);
+                if (!seenIds.add(pisteId)) {
+                    return false;
+                }
+
+                newArea.addNode(createPiste(pisteMatcher));
+                return true;
+            }
+
+            Matcher edgeMatcher = EDGE_PATTERN.matcher(line);
+            if (edgeMatcher.matches()) {
+                newArea.addEdges(edgeMatcher.group(1), edgeMatcher.group(2));
+                return true;
+            }
+        } catch (DateTimeParseException e) {
+            return false;
         }
 
-        Matcher regularMatcher = REGULAR_LIFT_PATTERN.matcher(line);
-        if (regularMatcher.matches()) {
-            newArea.addNode(createLift(regularMatcher, false));
-            return;
-        }
-
-        Matcher pisteMatcher = PISTE_PATTERN.matcher(line);
-        if (pisteMatcher.matches()) {
-            newArea.addNode(createPiste(pisteMatcher));
-            return;
-        }
-
-        Matcher edgeMatcher = EDGE_PATTERN.matcher(line);
-        if (edgeMatcher.matches()) {
-            newArea.addEdges(edgeMatcher.group(1), edgeMatcher.group(2));
-            return;
-        }
-
-        System.err.println("ERROR: Invalid line format");
+        return false;
     }
 
     private static Lift createLift(Matcher matcher, boolean isTransit) {
@@ -95,7 +139,7 @@ public final class AreaParser {
         LocalTime endTime = LocalTime.parse(matcher.group(4));
         int rideDuration = Integer.parseInt(matcher.group(5));
         int waitTime = Integer.parseInt(matcher.group(6));
-        return new Lift(id, type, startTime, endTime, rideDuration, waitTime,  isTransit);
+        return new Lift(id, type, startTime, endTime, rideDuration, waitTime, isTransit);
     }
 
     private static Piste createPiste(Matcher matcher) {
@@ -105,5 +149,88 @@ public final class AreaParser {
         int length = Integer.parseInt(matcher.group(4));
         int altitude = Integer.parseInt(matcher.group(5));
         return new Piste(id, diff, surf, length, altitude);
+    }
+
+    private static boolean validateArea(SkiArea area) {
+        if (!hasRequiredNodes(area)) {
+            return false;
+        }
+
+        List<SkiNode> allNodes = new ArrayList<>();
+        allNodes.addAll(area.getLifts());
+        allNodes.addAll(area.getPistes());
+
+        return hasValidEdges(area, allNodes) && isStronglyConnected(area, allNodes);
+    }
+
+    private static boolean isStronglyConnected(SkiArea area, List<SkiNode> allNodes) {
+        for (SkiNode startNode : allNodes) {
+            if (!canReachAll(area, allNodes, startNode)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static boolean canReachAll(SkiArea area, List<SkiNode> allNodes, SkiNode startNode) {
+        Set<SkiNode> visited = new HashSet<>();
+        Queue<SkiNode> queue = new LinkedList<>();
+
+        queue.add(startNode);
+        visited.add(startNode);
+
+        while (!queue.isEmpty()) {
+            SkiNode current = queue.poll();
+            List<SkiNode> connections = area.getConnections(current);
+
+            if (connections != null) {
+                for (SkiNode next : connections) {
+                    if (visited.add(next)) {
+                        queue.add(next);
+                    }
+                }
+            }
+        }
+
+        return visited.size() == allNodes.size();
+    }
+
+    private static boolean hasValidEdges(SkiArea area, List<SkiNode> allNodes) {
+        for (SkiNode node : allNodes) {
+            List<SkiNode> connections = area.getConnections(node);
+
+            if (connections == null || connections.isEmpty()) {
+                return false;
+            }
+
+            for (SkiNode target : connections) {
+                if (node.equals(target) || hasInvalidSymmetry(area, node, target)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean hasInvalidSymmetry(SkiArea area, SkiNode node, SkiNode target) {
+        List<SkiNode> targetConnections = area.getConnections(target);
+        return targetConnections != null && targetConnections.contains(node) && node.getClass() == target.getClass();
+    }
+
+    private static boolean hasRequiredNodes(SkiArea area) {
+        List<Lift> lifts = area.getLifts();
+        List<Piste> pistes = area.getPistes();
+
+        if (lifts == null || pistes == null || lifts.isEmpty() || pistes.isEmpty()) {
+            return false;
+        }
+
+        for (Lift lift : lifts) {
+            if (lift.isBaseStation()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

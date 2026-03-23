@@ -14,7 +14,6 @@ public class RoutePlanner {
     private final SkiArea area;
     private final Skier skier;
     private Route bestRoute = null;
-//    private int bestScore = -1;
 
     /**
      * Constructs a new {@code RoutePlanner} for the specified area and skier.
@@ -34,7 +33,6 @@ public class RoutePlanner {
      * @param startTime the time the skier begins the route
      * @param endTime the strict deadline by which the skier must return to a base station
      * @return the optimal {@code Route}, or {@code null} if no valid route exists
-     * @throws IllegalArgumentException if the start node is unknown, not a base station, or if the times are invalid
      */
     public Route plan(String startLiftId, LocalTime startTime, LocalTime endTime) {
         SkiNode startNode = area.getNode(startLiftId);
@@ -45,12 +43,25 @@ public class RoutePlanner {
             return null;
         }
 
-        Route initialRoute = new Route(startNode, startTime);
+        Route initialRoute = new Route(startNode, timeAfterFirstLift);
         this.bestRoute = null;
 
         findBestRoute(initialRoute, endTime, null, initialRoute.getPath().size());
 
         return bestRoute;
+    }
+
+    /**
+     * Dynamically recalculates the optimal route from the skier's current position and time.
+     * This is used when the skier's preferences, skill level, or goal change while a route
+     * is already active.
+     *
+     * @param currentRouteSoFar the truncated history of the route taken so far
+     * @param endTime the strict deadline by which the skier must return to a base station
+     * @return the newly optimized {@code Route}, or {@code null} if no valid route exists
+     */
+    public Route replan(Route currentRouteSoFar, LocalTime endTime) {
+        return findAlternativeRoute(currentRouteSoFar, endTime, null);
     }
 
     /**
@@ -85,6 +96,10 @@ public class RoutePlanner {
         boolean reachesBaseStation = false;
 
         for (SkiNode nextNode : area.getConnections(currentNode)) {
+            if (currentRoute.getPath().size() == avoidDepth && nextNode.equals(forbiddenNode)) {
+                continue;
+            }
+
             if (nextNode instanceof Lift && ((Lift) nextNode).isBaseStation()) {
                 reachesBaseStation = true;
                 break;
@@ -97,6 +112,10 @@ public class RoutePlanner {
 
         for (SkiNode nextNode : area.getConnections(currentNode)) {
             if (currentRoute.getPath().size() == avoidDepth && nextNode.equals(forbiddenNode)) {
+                continue;
+            }
+
+            if (currentRoute.getPath().contains(nextNode)) {
                 continue;
             }
 
@@ -146,10 +165,6 @@ public class RoutePlanner {
      * @param newRoute the newly completed valid route to evaluate
      */
     private void evaluateAndSaveIfBest(Route newRoute) {
-        if (newRoute.calculatePreferenceScore(skier) < 0) {
-            return;
-        }
-
         if (bestRoute == null) {
             bestRoute = newRoute;
             return;

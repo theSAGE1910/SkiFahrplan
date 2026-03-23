@@ -103,8 +103,7 @@ public class Route {
         Set<SkiNode> uniquePistes = new HashSet<>();
 
         for (SkiNode node : path) {
-            if (node instanceof Piste) {
-                Piste piste = (Piste) node;
+            if (node instanceof Piste piste) {
 
                 if (goal == Goal.ALTITUDE) {
                     score += piste.getAltitudeDifference();

@@ -18,7 +18,7 @@ public class Lift implements SkiNode {
     private final LocalTime endTime;
     private final int rideDuration;
     private final int waitTime;
-    private final boolean isBaseStation;
+    private final boolean baseStation;
 
     /**
      * Constructs a new {@code Lift} with the specified operational parameters.
@@ -29,16 +29,16 @@ public class Lift implements SkiNode {
      * @param endTime the operational closing time of the lift
      * @param rideDuration the duration of the lift ride in minutes
      * @param waitTime the expected queueing time before boarding in minutes
-     * @param isBaseStation {@code true} if this lift is a transit point to enter or exit the area, {@code false} otherwise
+     * @param baseStation {@code true} if this lift is a transit point to enter or exit the area, {@code false} otherwise
      */
-    public Lift(String id, LiftType type, LocalTime startTime, LocalTime endTime, int rideDuration, int waitTime, boolean isBaseStation) {
+    public Lift(String id, LiftType type, LocalTime startTime, LocalTime endTime, int rideDuration, int waitTime, boolean baseStation) {
         this.id = id;
         this.type = type;
         this.startTime = startTime;
         this.endTime = endTime;
         this.rideDuration = rideDuration;
         this.waitTime = waitTime;
-        this.isBaseStation = isBaseStation;
+        this.baseStation = baseStation;
     }
 
     /**
@@ -102,6 +102,6 @@ public class Lift implements SkiNode {
      * @return {@code true} if the lift is a base station, {@code false} otherwise
      */
     public boolean isBaseStation() {
-        return isBaseStation;
+        return baseStation;
     }
 }
