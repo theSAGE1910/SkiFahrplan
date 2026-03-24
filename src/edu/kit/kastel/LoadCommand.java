@@ -14,7 +14,6 @@ public class LoadCommand implements Command {
     private static final int EXPECTED_ARGS_LENGTH = 3;
     private static final int ARG_SUBCOMMAND_INDEX = 1;
     private static final int ARG_PATH_INDEX = 2;
-    private static final int DEFAULT_ROUTE_INDEX = 0;
 
     private static final String SUBCOMMAND_AREA = "area";
     private static final String ERROR_FILE_NOT_FOUND = "Error, File not found";
@@ -27,10 +26,7 @@ public class LoadCommand implements Command {
                 SkiArea parsedArea = AreaParser.parse(filepath);
 
                 if (parsedArea != null) {
-                    session.setSkiArea(parsedArea);
-                    session.setPlannedRoute(null);
-                    session.setCurrentRouteIndex(DEFAULT_ROUTE_INDEX);
-                    session.setNextWasCalled(false);
+                    session.resetForNewArea(parsedArea);
                 }
             } catch (IOException e) {
                 System.err.println(ERROR_FILE_NOT_FOUND);

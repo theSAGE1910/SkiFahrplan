@@ -94,16 +94,6 @@ public class SkiSession {
     }
 
     /**
-     * Overwrites the currently active ski area with a newly parsed map.
-     * This is typically invoked when the user successfully loads a new area file.
-     *
-     * @param skiArea the new {@link SkiArea} graph to be navigated
-     */
-    public void setSkiArea(SkiArea skiArea) {
-        this.skiArea = skiArea;
-    }
-
-    /**
      * Retrieves the profile of the skier associated with this session. The profile contains
      * the active skill level, optimization goal, and surface/difficulty preferences.
      *
@@ -212,5 +202,80 @@ public class SkiSession {
      */
     public void setActiveEndTime(LocalTime activeEndTime) {
         this.activeEndTime = activeEndTime;
+    }
+
+    /**
+     * Aborts the currently active route and resets the skier's navigation state.
+     * This clears the planned path and resets the progress tracking to the beginning.
+     *
+     * @return true if a route was active and successfully cleared, false if no route was planned
+     */
+    public boolean abortRoute() {
+        if (this.plannedRoute == null) {
+            return false;
+        }
+
+        this.plannedRoute = null;
+        this.currentRouteIndex = ROUTE_INDEX_START;
+        this.nextWasCalled = false;
+
+        return true;
+    }
+
+    /**
+     * Resets the current session state to accommodate a newly loaded ski area.
+     * This process overrides the old area, clears any actively planned routes, and resets the navigation progress.
+     *
+     * @param newArea the new ski area graph to be navigated in this session
+     */
+    public void resetForNewArea(SkiArea newArea) {
+        this.skiArea = newArea;
+        this.plannedRoute = null;
+        this.currentRouteIndex = ROUTE_INDEX_START;
+        this.nextWasCalled = false;
+    }
+
+    /**
+     * Concludes the current route by clearing the planned path and resetting navigation flags.
+     * This is typically called when the skier has successfully reached the final destination of their plan.
+     */
+    public void finishRoute() {
+        this.plannedRoute = null;
+        this.nextWasCalled = false;
+    }
+
+    /**
+     * Determines whether the skier has reached or passed the end of their currently planned route.
+     *
+     * @return true if the current route index meets or exceeds the route's end index, false otherwise
+     */
+    public boolean isRouteFinished() {
+        return this.currentRouteIndex >= getRouteEndIndex();
+    }
+
+    /**
+     * Checks whether there is currently a valid route assigned to the skier's session.
+     *
+     * @return true if a route is currently planned, false if the planned route is null
+     */
+    public boolean hasActiveRoute() {
+        return this.plannedRoute != null;
+    }
+
+    /**
+     * Advances the skier's progression to the next node in the planned route.
+     * This action evaluates whether a route is active, unfinished, and if the user has
+     * legally previewed the upcoming step before allowing progression.
+     *
+     * @return true if the skier successfully advanced, false if progression is blocked by invalid state
+     */
+    public boolean advanceToNextNode() {
+        if (plannedRoute == null || currentRouteIndex >= getRouteEndIndex() || !nextWasCalled) {
+            return false;
+        }
+
+        currentRouteIndex++;
+        nextWasCalled = false;
+        return true;
     }
 }

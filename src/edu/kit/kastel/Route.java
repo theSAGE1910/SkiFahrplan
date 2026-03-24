@@ -21,6 +21,7 @@ public class Route {
     private static final int INDEX_SECOND = 1;
     private static final int INITIAL_SCORE = 0;
     private static final int SCORE_INCREMENT = 1;
+    private static final int COMPARE_LESS_THAN = 0;
 
     private static final String ERROR_UNEXPECTED_GOAL = "Unexpected value: ";
     private static final String SEPARATOR_SPACE = " ";
@@ -107,7 +108,7 @@ public class Route {
      * @param skier the {@link Skier} whose goal is used to evaluate the route
      * @return the calculated utility score as an integer
      */
-    public int calculateUtility(Skier skier) {
+    private int calculateUtility(Skier skier) {
         Goal goal = skier.getGoal();
         int score = INITIAL_SCORE;
         Set<SkiNode> uniquePistes = new HashSet<>();
@@ -140,23 +141,12 @@ public class Route {
      * @param skier the {@link Skier} whose preferences are evaluated
      * @return the calculated preference score as an integer
      */
-    public int calculatePreferenceScore(Skier skier) {
+    private int calculatePreferenceScore(Skier skier) {
         int score = INITIAL_SCORE;
 
         for (SkiNode node : path) {
             if (node instanceof Piste piste) {
-
-                if (skier.likesDifficulty(piste.getDifficulty())) {
-                    score++;
-                } else if (skier.dislikesDifficulty(piste.getDifficulty())) {
-                    score--;
-                }
-
-                if (skier.likesSurface(piste.getSurface())) {
-                    score++;
-                } else if (skier.dislikesSurface(piste.getSurface())) {
-                    score--;
-                }
+                score += skier.evaluatePreferenceScore(piste); // Delegate to Skier
             }
         }
 
@@ -169,7 +159,7 @@ public class Route {
      *
      * @return the lexicographical string representation of the path
      */
-    public String getLexicographicalString() {
+    private String getLexicographicalString() {
         StringBuilder sb = new StringBuilder();
 
         for (SkiNode node : path) {
@@ -177,5 +167,40 @@ public class Route {
         }
 
         return sb.toString().trim();
+    }
+
+
+    /**
+     * Determines whether this route is strictly superior to another provided route.
+     * The comparison evaluates the main utility score first, falls back to the secondary preference
+     * score in case of a tie, and ultimately uses a lexicographical comparison of the node paths
+     * as a final tie-breaker.
+     *
+     * @param bestRoute the competing route to compare against, or {@code null} if no route currently exists
+     * @param skier the profile whose goals and preferences dictate the utility and preference scoring
+     * @return true if this route is strictly better or if the competing route is null, false otherwise
+     */
+    public boolean isBetterThan(Route bestRoute, Skier skier) {
+        boolean isBetter = true;
+
+        if (bestRoute != null) {
+            int thisUtility = this.calculateUtility(skier);
+            int bestUtility = bestRoute.calculateUtility(skier);
+
+            if (thisUtility != bestUtility) {
+                isBetter = thisUtility > bestUtility;
+            } else {
+                int thisPref = this.calculatePreferenceScore(skier);
+                int bestPref = bestRoute.calculatePreferenceScore(skier);
+
+                if (thisPref != bestPref) {
+                    isBetter = thisPref > bestPref;
+                } else {
+                    isBetter = this.getLexicographicalString().compareTo(bestRoute.getLexicographicalString()) < COMPARE_LESS_THAN;
+                }
+            }
+        }
+
+        return isBetter;
     }
 }

@@ -21,15 +21,14 @@ public class NextCommand implements Command {
             System.err.println(ERROR_INVALID_ARGS);
             return;
         }
-        if (session.getPlannedRoute() == null) {
+        if (!session.hasActiveRoute()) {
             System.err.println(ERROR_NO_ROUTE);
             return;
         }
 
-        if (session.getCurrentRouteIndex() >= session.getRouteEndIndex()) {
+        if (session.isRouteFinished()) {
             System.out.println(MSG_FINISHED);
-            session.setPlannedRoute(null);
-            session.setNextWasCalled(false);
+            session.finishRoute();
         } else {
             System.out.println(session.getPlannedRoute().getPath().get(session.getCurrentRouteIndex()).getId());
             session.setNextWasCalled(true);

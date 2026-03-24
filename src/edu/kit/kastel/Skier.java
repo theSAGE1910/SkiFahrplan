@@ -93,7 +93,7 @@ public class Skier {
      * @param difficulty the difficulty level to check
      * @return {@code true} if the skier likes the difficulty, {@code false} otherwise
      */
-    public boolean likesDifficulty(Difficulty difficulty) {
+    private boolean likesDifficulty(Difficulty difficulty) {
         return likedDifficulties.contains(difficulty);
     }
 
@@ -103,7 +103,7 @@ public class Skier {
      * @param difficulty the difficulty level to check
      * @return {@code true} if the skier dislikes the difficulty, {@code false} otherwise
      */
-    public boolean dislikesDifficulty(Difficulty difficulty) {
+    private boolean dislikesDifficulty(Difficulty difficulty) {
         return dislikedDifficulties.contains(difficulty);
     }
 
@@ -131,7 +131,7 @@ public class Skier {
      * @param surface the surface condition to check
      * @return {@code true} if the skier likes the surface, {@code false} otherwise
      */
-    public boolean likesSurface(Surface surface) {
+    private boolean likesSurface(Surface surface) {
         return likedSurfaces.contains(surface);
     }
 
@@ -141,7 +141,7 @@ public class Skier {
      * @param surface the surface condition to check
      * @return {@code true} if the skier dislikes the surface, {@code false} otherwise
      */
-    public boolean dislikesSurface(Surface surface) {
+    private boolean dislikesSurface(Surface surface) {
         return dislikedSurfaces.contains(surface);
     }
 
@@ -154,5 +154,30 @@ public class Skier {
         dislikedDifficulties.clear();
         likedSurfaces.clear();
         dislikedSurfaces.clear();
+    }
+
+    /**
+     * Evaluates a specific piste based on the skier's recorded surface and difficulty preferences.
+     * This calculates a numerical score where explicit positive preferences increase the score
+     * and explicit negative preferences decrease it.
+     *
+     * @param piste the ski slope to be evaluated against the profile
+     * @return the calculated integer preference score for the given piste
+     */
+    public int evaluatePreferenceScore(Piste piste) {
+        int score = 0;
+        if (likesDifficulty(piste.getDifficulty())) {
+            score++;
+        } else if (dislikesDifficulty(piste.getDifficulty())) {
+            score--;
+        }
+
+        if (likesSurface(piste.getSurface())) {
+            score++;
+        } else if (dislikesSurface(piste.getSurface())) {
+            score--;
+        }
+
+        return score;
     }
 }

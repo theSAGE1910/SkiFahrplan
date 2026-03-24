@@ -13,7 +13,6 @@ import java.time.LocalTime;
 public class RoutePlanner {
 
     private static final int MIN_PATH_LENGTH_FOR_EVALUATION = 1;
-    private static final int COMPARE_LESS_THAN = 0;
     private static final int INDEX_FIRST = 0;
 
     private final SkiArea area;
@@ -145,32 +144,8 @@ public class RoutePlanner {
      * @param newRoute the newly completed valid route to evaluate
      */
     private void evaluateAndSaveIfBest(Route newRoute) {
-        if (bestRoute == null) {
+        if (newRoute.isBetterThan(bestRoute, skier)) {
             bestRoute = newRoute;
-            return;
-        }
-
-        int newUtility = newRoute.calculateUtility(skier);
-        int bestUtility = bestRoute.calculateUtility(skier);
-
-        if (newUtility > bestUtility) {
-            bestRoute = newRoute;
-        } else if (newUtility == bestUtility) {
-
-            int newPreference = newRoute.calculatePreferenceScore(skier);
-            int bestPreference = bestRoute.calculatePreferenceScore(skier);
-
-            if (newPreference > bestPreference) {
-                bestRoute = newRoute;
-            } else if (newPreference == bestPreference) {
-
-                String newString = newRoute.getLexicographicalString();
-                String bestString = bestRoute.getLexicographicalString();
-
-                if (newString.compareTo(bestString) < COMPARE_LESS_THAN) {
-                    bestRoute = newRoute;
-                }
-            }
         }
     }
 }

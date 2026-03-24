@@ -28,6 +28,8 @@ public class Piste implements SkiNode {
     private static final double SKILL_INTERMEDIATE = 1.10;
     private static final double SKILL_EXPERT = 0.90;
 
+    private static final String SEPARATOR = " ";
+
     private final String id;
     private final Difficulty difficulty;
     private final Surface surface;
@@ -130,5 +132,15 @@ public class Piste implements SkiNode {
         double timeInSeconds = (this.length / BASE_SPEED_DIVISOR) * multipliers;
 
         return (int) Math.round(timeInSeconds);
+    }
+
+    /**
+     * Constructs a formatted string representation of this piste's physical attributes.
+     * This includes the identifier, difficulty level, surface condition, total length, and altitude difference.
+     *
+     * @return a formatted string containing the piste's attributes separated by spaces
+     */
+    public String getFormattedListInfo() {
+        return id + SEPARATOR + difficulty + SEPARATOR + surface + SEPARATOR + length + SEPARATOR + altitudeDifference;
     }
 }

@@ -17,6 +17,9 @@ public class Lift implements SkiNode {
     private static final int DUR_RIDE = 0;
     private static final int DUR_WAIT = 1;
 
+    private static final String SEPARATOR = " ";
+    private static final String TRANSIT_SUFFIX = " TRANSIT";
+
     private final String id;
     private final LiftType type;
     private final LocalTime startTime;
@@ -64,56 +67,22 @@ public class Lift implements SkiNode {
     }
 
     /**
-     * Gets the specific type of this lift.
-     *
-     * @return the {@link LiftType} of the lift
-     */
-    public LiftType getType() {
-        return type;
-    }
-
-    /**
-     * Gets the operational opening time of this lift.
-     *
-     * @return the time the lift starts operating
-     */
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    /**
-     * Gets the operational closing time of this lift.
-     *
-     * @return the time the lift stops operating
-     */
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    /**
-     * Gets the duration it takes to travel on this lift.
-     *
-     * @return the ride duration in minutes
-     */
-    public int getRideDuration() {
-        return rideDuration;
-    }
-
-    /**
-     * Gets the expected queueing or waiting time before boarding this lift.
-     *
-     * @return the waiting time in minutes
-     */
-    public int getWaitTime() {
-        return waitTime;
-    }
-
-    /**
      * Indicates whether this lift serves as a base station (transit lift).
      *
      * @return {@code true} if the lift is a base station, {@code false} otherwise
      */
     public boolean isBaseStation() {
         return baseStation;
+    }
+
+    /**
+     * Constructs a formatted string representation of this lift's operational details.
+     * This includes the identifier, lift type, operational hours, durations, and whether it serves as a base station.
+     *
+     * @return a formatted string containing the lift's attributes separated by spaces
+     */
+    public String getFormattedListInfo() {
+        return id + SEPARATOR + type + SEPARATOR + startTime + SEPARATOR + endTime + SEPARATOR
+            + rideDuration + SEPARATOR + waitTime + (baseStation ? TRANSIT_SUFFIX : "");
     }
 }

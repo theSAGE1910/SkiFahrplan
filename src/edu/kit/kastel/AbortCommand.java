@@ -11,7 +11,7 @@ package edu.kit.kastel;
 public class AbortCommand implements Command {
 
     private static final int EXPECTED_ARGS_LENGTH = 1;
-    private static final int DEFAULT_ROUTE_INDEX = 0;
+
     private static final String ERROR_INVALID_ARGS = "Error, abort takes no arguments.";
     private static final String ERROR_NO_ROUTE = "Error, No route to abort.";
     private static final String SUCCESS_MESSAGE = "route aborted";
@@ -27,16 +27,10 @@ public class AbortCommand implements Command {
     public void execute(String[] parts, SkiSession session) {
         if (parts.length != EXPECTED_ARGS_LENGTH) {
             System.err.println(ERROR_INVALID_ARGS);
-            return;
-        }
-        if (session.getPlannedRoute() == null) {
+        } else if (!session.abortRoute()) {
             System.err.println(ERROR_NO_ROUTE);
-            return;
+        } else {
+            System.out.println(SUCCESS_MESSAGE);
         }
-
-        session.setPlannedRoute(null);
-        session.setCurrentRouteIndex(DEFAULT_ROUTE_INDEX);
-        session.setNextWasCalled(false);
-        System.out.println(SUCCESS_MESSAGE);
     }
 }

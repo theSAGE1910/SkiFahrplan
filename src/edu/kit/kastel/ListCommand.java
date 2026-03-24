@@ -15,9 +15,6 @@ public class ListCommand implements Command {
     private static final String TYPE_LIFTS = "lifts";
     private static final String TYPE_SLOPES = "slopes";
 
-    private static final String SEPARATOR = " ";
-    private static final String TRANSIT_SUFFIX = " TRANSIT";
-
     private static final String ERROR_NO_AREA = "Error, No ski area loaded.";
 
     @Override
@@ -29,16 +26,11 @@ public class ListCommand implements Command {
 
         if (parts.length == EXPECTED_ARGS_LENGTH && parts[ARG_TYPE_INDEX].equals(TYPE_LIFTS)) {
             for (Lift lift : session.getSkiArea().getLifts()) {
-                System.out.println(lift.getId() + SEPARATOR + lift.getType() + SEPARATOR
-                    + lift.getStartTime() + SEPARATOR + lift.getEndTime() + SEPARATOR
-                    + lift.getRideDuration() + SEPARATOR + lift.getWaitTime()
-                    + (lift.isBaseStation() ? TRANSIT_SUFFIX : ""));
+                System.out.println(lift.getFormattedListInfo());
             }
         } else if (parts.length == EXPECTED_ARGS_LENGTH && parts[ARG_TYPE_INDEX].equals(TYPE_SLOPES)) {
             for (Piste piste : session.getSkiArea().getPistes()) {
-                System.out.println(piste.getId() + SEPARATOR + piste.getDifficulty() + SEPARATOR
-                    + piste.getSurface() + SEPARATOR + piste.getLength() + SEPARATOR
-                    + piste.getAltitudeDifference());
+                System.out.println(piste.getFormattedListInfo());
             }
         } else {
             System.err.println(ErrorHandler.ERROR_INVALID_SYNTAX);

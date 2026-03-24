@@ -1,6 +1,5 @@
 package edu.kit.kastel;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +38,13 @@ public class SkiArea {
      * @return {@code true} if the node was successfully added, or {@code false} if a node with the same ID already exists
      */
     public boolean addNode(SkiNode node) {
-        if (this.nodesById.containsKey(node.getId())) {
-            System.err.println(ERROR_NODE_EXISTS_PREFIX + node.getId() + ERROR_NODE_EXISTS_SUFFIX);
+        String id = node.getId();
+
+        if (this.nodesById.containsKey(id)) {
+            System.err.println(ERROR_NODE_EXISTS_PREFIX + id + ERROR_NODE_EXISTS_SUFFIX);
             return false;
         }
-        this.nodesById.put(node.getId(), node);
+        this.nodesById.put(id, node);
         connections.put(node, new ArrayList<>());
         return true;
     }
