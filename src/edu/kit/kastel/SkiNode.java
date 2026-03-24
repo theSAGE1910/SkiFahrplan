@@ -27,4 +27,12 @@ public interface SkiNode {
      * @return the calculated completion time, or {@code null} if traversal is impossible (e.g., closed lift)
      */
     LocalTime calculateNextTime(LocalTime arrivalTime, Skier skier);
+
+    /**
+     * Calculates the preference score of this node based on the provided skier's profile.
+     *
+     * @param skier the profile containing the specific likes and dislikes
+     * @return the calculated integer preference score for this node
+     */
+    int calculatePreferenceScore(Skier skier);
 }

@@ -136,18 +136,15 @@ public class Route {
 
     /**
      * Calculates the secondary preference score of the route based on the skier's likes and dislikes.
-     * Each liked attribute adds to the score, while each disliked attribute subtracts from it.
      *
-     * @param skier the {@link Skier} whose preferences are evaluated
+     * @param skier the profile whose preferences are evaluated
      * @return the calculated preference score as an integer
      */
     private int calculatePreferenceScore(Skier skier) {
         int score = INITIAL_SCORE;
 
         for (SkiNode node : path) {
-            if (node instanceof Piste piste) {
-                score += skier.evaluatePreferenceScore(piste); // Delegate to Skier
-            }
+            score += node.calculatePreferenceScore(skier);
         }
 
         return score;

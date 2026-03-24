@@ -65,21 +65,29 @@ public class Piste implements SkiNode {
     }
 
     /**
-     * Retrieves the difficulty level of this piste.
+     * Calculates the preference score of this piste based on the provided skier's profile.
+     * The score increases for liked attributes and decreases for disliked attributes.
      *
-     * @return the difficulty classification (e.g., BLUE, RED, BLACK)
+     * @param skier the profile containing the specific likes and dislikes
+     * @return the calculated integer preference score for this piste
      */
-    public Difficulty getDifficulty() {
-        return difficulty;
-    }
+    @Override
+    public int calculatePreferenceScore(Skier skier) {
+        int score = 0;
 
-    /**
-     * Retrieves the surface condition of this piste.
-     *
-     * @return the physical surface state (e.g., ICY, BUMPY)
-     */
-    public Surface getSurface() {
-        return surface;
+        if (skier.likesDifficulty(this.difficulty)) {
+            score++;
+        } else if (skier.dislikesDifficulty(this.difficulty)) {
+            score--;
+        }
+
+        if (skier.likesSurface(this.surface)) {
+            score++;
+        } else if (skier.dislikesSurface(this.surface)) {
+            score--;
+        }
+
+        return score;
     }
 
     /**

@@ -67,6 +67,19 @@ public class Lift implements SkiNode {
     }
 
     /**
+     * Calculates the preference score of this lift based on the provided skier's profile.
+     * Since lifts do not possess physical attributes like difficulty or surface condition,
+     * they do not affect the skier's preference score.
+     *
+     * @param skier the profile containing the specific likes and dislikes
+     * @return always returns 0 for a lift
+     */
+    @Override
+    public int calculatePreferenceScore(Skier skier) {
+        return 0;
+    }
+
+    /**
      * Indicates whether this lift serves as a base station (transit lift).
      *
      * @return {@code true} if the lift is a base station, {@code false} otherwise
