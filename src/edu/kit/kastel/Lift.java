@@ -12,6 +12,11 @@ import java.time.LocalTime;
  */
 public class Lift implements SkiNode {
 
+    private static final int TIME_START = 0;
+    private static final int TIME_END = 1;
+    private static final int DUR_RIDE = 0;
+    private static final int DUR_WAIT = 1;
+
     private final String id;
     private final LiftType type;
     private final LocalTime startTime;
@@ -24,31 +29,38 @@ public class Lift implements SkiNode {
      * Constructs a new {@code Lift} with the specified operational parameters.
      *
      * @param id the unique identifier of the lift
-     * @param type the specific {@link LiftType} (e.g., gondola or chairlift)
-     * @param startTime the operational opening time of the lift
-     * @param endTime the operational closing time of the lift
-     * @param rideDuration the duration of the lift ride in minutes
-     * @param waitTime the expected queueing time before boarding in minutes
-     * @param baseStation {@code true} if this lift is a transit point to enter or exit the area, {@code false} otherwise
+     * @param type the specific {@link LiftType}
+     * @param times an array containing [startTime, endTime]
+     * @param durations an array containing [rideDuration, waitTime]
+     * @param baseStation {@code true} if this lift is a transit point
      */
-    public Lift(String id, LiftType type, LocalTime startTime, LocalTime endTime, int rideDuration, int waitTime, boolean baseStation) {
+    public Lift(String id, LiftType type, LocalTime[] times, int[] durations, boolean baseStation) {
         this.id = id;
         this.type = type;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.rideDuration = rideDuration;
-        this.waitTime = waitTime;
+        this.startTime = times[TIME_START];
+        this.endTime = times[TIME_END];
+        this.rideDuration = durations[DUR_RIDE];
+        this.waitTime = durations[DUR_WAIT];
         this.baseStation = baseStation;
     }
 
-    /**
-     * Gets the unique identifier of this lift.
-     *
-     * @return the lift identifier as a string
-     */
     @Override
     public String getId() {
         return this.id;
+    }
+
+    @Override
+    public LocalTime calculateNextTime(LocalTime arrivalTime, Skier skier) {
+        LocalTime readyToBoard = arrivalTime.plusMinutes(this.waitTime);
+
+        if (readyToBoard.isBefore(this.startTime)) {
+            readyToBoard = this.startTime;
+        }
+
+        if (!readyToBoard.isBefore(this.endTime)) {
+            return null;
+        }
+        return readyToBoard.plusMinutes(this.rideDuration);
     }
 
     /**

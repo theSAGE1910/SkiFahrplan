@@ -136,25 +136,7 @@ public class RoutePlanner {
      * @return the calculated arrival time, or {@code null} if the lift is closed or the deadline is missed
      */
     private LocalTime calculateNextTime(LocalTime arrivalTime, SkiNode nextNode) {
-        if (nextNode instanceof Lift lift) {
-
-            LocalTime readyToBoard = arrivalTime.plusMinutes(lift.getWaitTime());
-
-            if (readyToBoard.isBefore(lift.getStartTime())) {
-                readyToBoard = lift.getStartTime();
-            }
-
-            if (!readyToBoard.isBefore(lift.getEndTime())) {
-                return null;
-            }
-            return readyToBoard.plusMinutes(lift.getRideDuration());
-        } else if (nextNode instanceof Piste piste) {
-
-            int travelSeconds = piste.calculateTravelTime(skier.getSkillLevel());
-            return arrivalTime.plusSeconds(travelSeconds);
-        }
-
-        return null;
+        return nextNode.calculateNextTime(arrivalTime, skier);
     }
 
     /**

@@ -18,7 +18,6 @@ public class LoadCommand implements Command {
 
     private static final String SUBCOMMAND_AREA = "area";
     private static final String ERROR_FILE_NOT_FOUND = "Error, File not found";
-    private static final String ERROR_INVALID_SYNTAX = "Error, Invalid syntax.";
 
     @Override
     public void execute(String[] parts, SkiSession session) {
@@ -37,7 +36,7 @@ public class LoadCommand implements Command {
                 System.err.println(ERROR_FILE_NOT_FOUND);
             }
         } else {
-            System.err.println(ERROR_INVALID_SYNTAX);
+            System.err.println(ErrorHandler.ERROR_INVALID_SYNTAX);
         }
     }
 }

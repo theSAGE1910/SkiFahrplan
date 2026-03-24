@@ -35,61 +35,45 @@ public class PlanCommand implements Command {
     public void execute(String[] parts, SkiSession session) {
         if (parts.length != EXPECTED_ARGS_LENGTH) {
             System.err.println(ERROR_INVALID_SYNTAX);
-            return;
-        }
-
-        if (session.getSkiArea() == null) {
+        } else if (session.getSkiArea() == null) {
             System.err.println(ERROR_NO_AREA);
-            return;
-        }
-
-        if (session.getSkier().getGoal() == null || session.getSkier().getSkillLevel() == null) {
+        } else if (session.getSkier().getGoal() == null || session.getSkier().getSkillLevel() == null) {
             System.err.println(ERROR_NO_SKILL_GOAL);
-            return;
-        }
-
-        if (session.getPlannedRoute() != null) {
+        } else if (session.getPlannedRoute() != null) {
             System.err.println(ERROR_ROUTE_EXISTS);
-            return;
-        }
-
-        String liftId = parts[ARG_LIFT_ID_INDEX];
-        LocalTime startTime;
-        LocalTime endTime;
-
-        try {
-            startTime = LocalTime.parse(parts[ARG_START_TIME_INDEX]);
-            endTime = LocalTime.parse(parts[ARG_END_TIME_INDEX]);
-        } catch (DateTimeParseException e) {
-            System.err.println(ERROR_INVALID_TIME);
-            return;
-        }
-
-        SkiNode startNode = session.getSkiArea().getNode(liftId);
-        if (startNode == null) {
-            System.err.println(ERROR_UNKNOWN_NODE);
-            return;
-        }
-        if (!(startNode instanceof Lift) || !((Lift) startNode).isBaseStation()) {
-            System.err.println(ERROR_NOT_BASE_STATION);
-            return;
-        }
-        if (!startTime.isBefore(endTime)) {
-            System.err.println(ERROR_TIME_ORDER);
-            return;
-        }
-
-        RoutePlanner planner = new RoutePlanner(session.getSkiArea(), session.getSkier());
-        Route bestRoute = planner.plan(liftId, startTime, endTime);
-
-        if (bestRoute == null) {
-            System.err.println(ERROR_NO_ROUTE_FOUND);
         } else {
-            System.out.println(MSG_ROUTE_PLANNED);
-            session.setPlannedRoute(bestRoute);
-            session.setActiveEndTime(endTime);
-            session.setCurrentRouteIndex(DEFAULT_ROUTE_INDEX);
-            session.setNextWasCalled(false);
+
+            String liftId = parts[ARG_LIFT_ID_INDEX];
+
+            try {
+                LocalTime startTime = LocalTime.parse(parts[ARG_START_TIME_INDEX]);
+                LocalTime endTime = LocalTime.parse(parts[ARG_END_TIME_INDEX]);
+
+                SkiNode startNode = session.getSkiArea().getNode(liftId);
+
+                if (startNode == null) {
+                    System.err.println(ERROR_UNKNOWN_NODE);
+                } else if (!(startNode instanceof Lift) || !((Lift) startNode).isBaseStation()) {
+                    System.err.println(ERROR_NOT_BASE_STATION);
+                } else if (!startTime.isBefore(endTime)) {
+                    System.err.println(ERROR_TIME_ORDER);
+                } else {
+                    RoutePlanner planner = new RoutePlanner(session.getSkiArea(), session.getSkier());
+                    Route bestRoute = planner.plan(liftId, startTime, endTime);
+
+                    if (bestRoute == null) {
+                        System.err.println(ERROR_NO_ROUTE_FOUND);
+                    } else {
+                        System.out.println(MSG_ROUTE_PLANNED);
+                        session.setPlannedRoute(bestRoute);
+                        session.setActiveEndTime(endTime);
+                        session.setCurrentRouteIndex(DEFAULT_ROUTE_INDEX);
+                        session.setNextWasCalled(false);
+                    }
+                }
+            } catch (DateTimeParseException e) {
+                System.err.println(ERROR_INVALID_TIME);
+            }
         }
     }
 }

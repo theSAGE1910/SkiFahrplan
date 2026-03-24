@@ -173,13 +173,15 @@ public class SkiSession {
     }
 
     /**
-     * Checks if the 'next' command was the most recently executed action. This state restricts
-     * certain progression commands (like 'take' or 'alternative') from being executed out of order.
+     * Checks if the 'next' command was NOT the most recently executed action.
+     * This state restricts certain progression commands (like 'take' or 'alternative')
+     * from being executed out of order, requiring the user to preview the next step first.
      *
-     * @return {@code true} if the user just queried the next step, {@code false} otherwise
+     * @return {@code true} if the user has NOT just queried the next step,
+     *      {@code false} if the 'next' command was the last action performed
      */
-    public boolean isNextWasCalled() {
-        return nextWasCalled;
+    public boolean isNextNotCalled() {
+        return !nextWasCalled;
     }
 
     /**

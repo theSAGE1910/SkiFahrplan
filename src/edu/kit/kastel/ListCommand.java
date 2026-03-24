@@ -19,7 +19,6 @@ public class ListCommand implements Command {
     private static final String TRANSIT_SUFFIX = " TRANSIT";
 
     private static final String ERROR_NO_AREA = "Error, No ski area loaded.";
-    private static final String ERROR_INVALID_SYNTAX = "Error, Invalid syntax.";
 
     @Override
     public void execute(String[] parts, SkiSession session) {
@@ -42,7 +41,7 @@ public class ListCommand implements Command {
                     + piste.getAltitudeDifference());
             }
         } else {
-            System.err.println(ERROR_INVALID_SYNTAX);
+            System.err.println(ErrorHandler.ERROR_INVALID_SYNTAX);
         }
     }
 }

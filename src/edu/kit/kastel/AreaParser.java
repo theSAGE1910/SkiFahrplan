@@ -106,48 +106,45 @@ public final class AreaParser {
     }
 
     private static boolean parseLine(String line, SkiArea newArea) {
+        boolean success = false;
+
         try {
             Matcher transitMatcher = TRANSIT_LIFT_PATTERN.matcher(line);
+            Matcher regularMatcher = REGULAR_LIFT_PATTERN.matcher(line);
+            Matcher pisteMatcher = PISTE_PATTERN.matcher(line);
+            Matcher edgeMatcher = EDGE_PATTERN.matcher(line);
+
             if (transitMatcher.matches()) {
                 Lift lift = createLift(transitMatcher, true);
                 if (lift == null) {
                     System.err.println(ERROR_LIFT_TIME);
-                    return false;
+                } else {
+                    success = newArea.addNode(lift);
                 }
-                return newArea.addNode(lift);
-            }
-
-            Matcher regularMatcher = REGULAR_LIFT_PATTERN.matcher(line);
-            if (regularMatcher.matches()) {
+            } else if (regularMatcher.matches()) {
                 Lift lift = createLift(regularMatcher, false);
                 if (lift == null) {
                     System.err.println(ERROR_LIFT_TIME);
-                    return false;
+                } else {
+                    success = newArea.addNode(lift);
                 }
-                return newArea.addNode(lift);
-            }
-
-            Matcher pisteMatcher = PISTE_PATTERN.matcher(line);
-            if (pisteMatcher.matches()) {
+            } else if (pisteMatcher.matches()) {
                 Piste piste = createPiste(pisteMatcher);
                 if (piste == null) {
                     System.err.println(ERROR_PISTE_DIMENSIONS);
-                    return false;
+                } else {
+                    success = newArea.addNode(piste);
                 }
-                return newArea.addNode(piste);
-            }
-
-            Matcher edgeMatcher = EDGE_PATTERN.matcher(line);
-            if (edgeMatcher.matches()) {
-                return newArea.addEdges(edgeMatcher.group(EDGE_GROUP_FROM), edgeMatcher.group(EDGE_GROUP_TO));
+            } else if (edgeMatcher.matches()) {
+                success = newArea.addEdges(edgeMatcher.group(EDGE_GROUP_FROM), edgeMatcher.group(EDGE_GROUP_TO));
+            } else {
+                System.err.println(ERROR_INVALID_LINE);
             }
         } catch (DateTimeParseException e) {
             System.err.println(ERROR_INVALID_TIME);
-            return false;
         }
 
-        System.err.println(ERROR_INVALID_LINE);
-        return false;
+        return success;
     }
 
     private static Lift createLift(MatchResult matcher, boolean isTransit) {
@@ -162,7 +159,11 @@ public final class AreaParser {
 
         int rideDuration = Integer.parseInt(matcher.group(LIFT_GROUP_RIDE_DURATION));
         int waitTime = Integer.parseInt(matcher.group(LIFT_GROUP_WAIT_TIME));
-        return new Lift(id, type, startTime, endTime, rideDuration, waitTime, isTransit);
+
+        LocalTime[] times = {startTime, endTime};
+        int[] durations = {rideDuration, waitTime};
+
+        return new Lift(id, type, times, durations, isTransit);
     }
 
     private static Piste createPiste(MatchResult matcher) {

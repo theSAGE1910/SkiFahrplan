@@ -35,7 +35,7 @@ public class AlternativeCommand implements Command {
             System.err.println(ERROR_INVALID_ARGS);
             return;
         }
-        if (session.getPlannedRoute() == null || !session.isNextWasCalled()) {
+        if (session.getPlannedRoute() == null || session.isNextNotCalled()) {
             System.err.println(ERROR_WRONG_STATE);
             return;
         }

@@ -16,7 +16,6 @@ public class ShowCommand implements Command {
 
     private static final String SEPARATOR_SPACE = " ";
 
-    private static final String ERROR_NO_ROUTE_OR_FINISHED = "Error, No route planned or route already finished.";
     private static final String ERROR_INVALID_SYNTAX = "Error, Invalid syntax. Use: show route";
 
     /**
@@ -31,7 +30,7 @@ public class ShowCommand implements Command {
     public void execute(String[] parts, SkiSession session) {
         if (parts.length == EXPECTED_ARGS_LENGTH && parts[ARG_TARGET_INDEX].equals(TARGET_ROUTE)) {
             if (session.getPlannedRoute() == null || session.getCurrentRouteIndex() >= session.getRouteEndIndex()) {
-                System.err.println(ERROR_NO_ROUTE_OR_FINISHED);
+                System.err.println(ErrorHandler.ERROR_NO_ROUTE_OR_FINISHED);
                 return;
             }
 

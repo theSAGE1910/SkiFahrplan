@@ -14,7 +14,6 @@ public class TakeCommand implements Command {
     private static final int ROUTE_STEP_SIZE = 1;
 
     private static final String ERROR_INVALID_ARGS = "Error, take takes no arguments.";
-    private static final String ERROR_NO_ROUTE_OR_FINISHED = "Error, No route planned or route already finished.";
     private static final String ERROR_MISSING_NEXT = "Error, take must be called immediately after next.";
 
     /**
@@ -32,10 +31,10 @@ public class TakeCommand implements Command {
             return;
         }
         if (session.getPlannedRoute() == null || session.getCurrentRouteIndex() >= session.getRouteEndIndex()) {
-            System.err.println(ERROR_NO_ROUTE_OR_FINISHED);
+            System.err.println(ErrorHandler.ERROR_NO_ROUTE_OR_FINISHED);
             return;
         }
-        if (!session.isNextWasCalled()) {
+        if (session.isNextNotCalled()) {
             System.err.println(ERROR_MISSING_NEXT);
             return;
         }

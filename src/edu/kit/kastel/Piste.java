@@ -1,5 +1,7 @@
 package edu.kit.kastel;
 
+import java.time.LocalTime;
+
 /**
  * Represents a ski piste (slope) in the ski area graph.
  * A piste connects different nodes and has specific physical attributes such as
@@ -54,6 +56,12 @@ public class Piste implements SkiNode {
         return this.id;
     }
 
+    @Override
+    public LocalTime calculateNextTime(LocalTime arrivalTime, Skier skier) {
+        int travelSeconds = this.calculateTravelTime(skier.getSkillLevel());
+        return arrivalTime.plusSeconds(travelSeconds);
+    }
+
     /**
      * Retrieves the difficulty level of this piste.
      *
@@ -98,7 +106,7 @@ public class Piste implements SkiNode {
      * @param skill the {@link SkillLevel} of the skier navigating the piste
      * @return the calculated travel time in seconds, rounded up to the nearest whole second
      */
-    public int calculateTravelTime(SkillLevel skill) {
+    private int calculateTravelTime(SkillLevel skill) {
         double mDifficulty = switch (this.difficulty) {
             case BLUE -> DIFF_BLUE;
             case RED -> DIFF_RED;

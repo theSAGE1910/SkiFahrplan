@@ -17,7 +17,6 @@ import java.util.Set;
  */
 public class Route {
 
-    private static final int INDEX_OFFSET_LAST = 1;
     private static final int INDEX_FIRST = 0;
     private static final int INDEX_SECOND = 1;
     private static final int INITIAL_SCORE = 0;
@@ -62,7 +61,7 @@ public class Route {
      * @return an ordered list of nodes representing the path
      */
     public List<SkiNode> getPath() {
-        return path;
+        return new ArrayList<>(path);
     }
 
     /**
@@ -71,7 +70,7 @@ public class Route {
      * @return the accumulated time at the end of the route
      */
     public LocalTime getCurrentTime() {
-        return this.times.get(this.times.size() - INDEX_OFFSET_LAST);
+        return this.times.getLast();
     }
 
     /**
@@ -80,7 +79,7 @@ public class Route {
      * @return the current node the skier is located at
      */
     public SkiNode getCurrentNode() {
-        return path.get(path.size() - INDEX_OFFSET_LAST);
+        return path.getLast();
     }
 
     /**
@@ -115,16 +114,18 @@ public class Route {
 
         for (SkiNode node : path) {
             if (node instanceof Piste piste) {
-                switch (goal) {
-                    case ALTITUDE -> score += piste.getAltitudeDifference();
-                    case DISTANCE -> score += piste.getLength();
-                    case NUMBER -> score += SCORE_INCREMENT;
-                    case UNIQUE -> {
-                        if (uniquePistes.add(piste)) {
-                            score += SCORE_INCREMENT;
-                        }
+                if (goal == Goal.ALTITUDE) {
+                    score += piste.getAltitudeDifference();
+                } else if (goal == Goal.DISTANCE) {
+                    score += piste.getLength();
+                } else if (goal == Goal.NUMBER) {
+                    score += SCORE_INCREMENT;
+                } else if (goal == Goal.UNIQUE) {
+                    if (uniquePistes.add(piste)) {
+                        score += SCORE_INCREMENT;
                     }
-                    default -> System.err.println(ERROR_UNEXPECTED_GOAL + goal);
+                } else {
+                    System.err.println(ERROR_UNEXPECTED_GOAL + goal);
                 }
             }
         }
